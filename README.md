@@ -20,3 +20,18 @@ Youtube API로 한국 지역에서 live streaming중인 방송 정보를 긁어�
 
 ## 스크래핑 주기
 실시간 방송의 시청자 수는 계속 변하기 때문에 아마 1~5분 주기로 계속 API 호출 또는 스크래핑을 할 것 같습니다.
+
+## 개발 환경
+- Ubuntu
+- MacOS
+(둘다 UNIX 기반이라 아무거나 사용하시면 됩니다.)
+
+## 파이썬 버전 관리 및 가상 환경 툴
+- pyenv
+- poetry
+
+## 사용 기술
+- Python
+- Django
+- Selenium, BeautifulSoup4
+- 그 이외...
