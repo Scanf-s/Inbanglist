@@ -42,7 +42,7 @@ API 호출에 한계가 존재하기 때문에 2초마다 데이터베이스에 
 [링크](https://github.com/Scanf-s/live_streaming_lists/blob/main/whyCDN.md)
 
 ## Kafka에 대해서
-[링크] (https://github.com/Scanf-s/live_streaming_lists/blob/main/what_is_kafka.md)
+[링크](https://github.com/Scanf-s/live_streaming_lists/blob/main/what_is_kafka.md)
 
 ## 개발 환경
 - Ubuntu
