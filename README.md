@@ -38,7 +38,10 @@ API 호출에 한계가 존재하기 때문에 2초마다 데이터베이스에 
 
 ## CDN에서 이미지를 배포하는게 더 효율적인 이유
 
+[링크](https://github.com/Scanf-s/live_streaming_lists/blob/main/whyCDN.md)
 
+## Kafka에 대해서
+[링크] ()
 
 ## 개발 환경
 - Ubuntu
