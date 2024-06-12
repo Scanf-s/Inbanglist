@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "live-streaming-lists"
+version = "0.1.0"
+description = ""
+authors = ["Sullung <sullung2yo@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+selenium = "^4.21.0"
+beautifulsoup4 = "^4.12.3"
+webdriver-manager = "^4.0.1"
+pandas = "^2.2.2"
+matplotlib = "^3.9.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

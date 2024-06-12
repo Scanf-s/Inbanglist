@@ -1,27 +1,26 @@
+import re
 import time
-from random import randint, uniform
-from typing import List, Tuple, Any
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 
+import pandas as pd
+import matplotlib.pyplot as plt
 
-def init_driver() -> WebDriver:
-    """
-    웹 드라이버 초기화
-    """
+
+def init_driver():
     user_info = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
     service = Service(ChromeDriverManager().install())
 
-    options: Options = Options()
+    options = Options()
     options.add_experimental_option("detach", True)  # Keep browser open
     options.add_experimental_option('excludeSwitches', ['disable-popup-blocking', 'enable-automation'])  # Disable popup
     options.add_argument("window-size=800,1280")  # Set window size
@@ -30,15 +29,11 @@ def init_driver() -> WebDriver:
     options.add_argument("--mute-audio")  # Mute audio
     options.add_argument(f"user-agent={user_info}")
 
-    new_driver: WebDriver = webdriver.Chrome(options=options, service=service)
+    new_driver = webdriver.Chrome(options=options, service=service)
     return new_driver
 
 
 def scroll(driver):
-    """
-    페이지 끝까지 내려주는 함수
-    Contributor : im-niber(GyuJae Jo)
-    """
     elem = driver.find_element(By.TAG_NAME, "body")
 
     no_of_pagedowns = 999
@@ -68,88 +63,64 @@ def press_show_all(driver):
     """
     모두보기 버튼 클릭
     """
-    contents: WebElement = driver.find_element(By.ID, "contents")
-    first_section: WebElement = contents.find_element(By.TAG_NAME, "ytd-rich-section-renderer")
-    menu_container: WebElement = first_section.find_element(By.ID, "menu-container")
+    contents = driver.find_element(By.ID, "contents")
+    first_section = contents.find_element(By.TAG_NAME, "ytd-rich-section-renderer")
+    menu_container = first_section.find_element(By.ID, "menu-container")
     ActionChains(driver).move_to_element(menu_container).click().perform()
-    time.sleep(3)
+    time.sleep(5)
 
 
-def parse_viewer_count(viewer_count: str) -> int:
+def get_live_details(driver):
     """
-    K나 M 붙은 숫자들 파싱해주는 함수 (Chat GPT 4o 사용)
+    Crawling 함수
+    + 필터링 기능
     """
-    viewer_count = viewer_count.replace(' watching', '').replace(',', '')
-    if 'K' in viewer_count:
-        return int(float(viewer_count.replace('K', '')) * 1000)
-    elif 'M' in viewer_count:
-        return int(float(viewer_count.replace('M', '')) * 1000000)
-    else:
-        return int(viewer_count)
+    page = driver.page_source
+    soup = BeautifulSoup(page, "html.parser")
+
+    thumbnail_list = [img['src'] for yt_image in soup.find_all("yt-image") for img in yt_image.find_all("img") if
+                      'src' in img.attrs]
+    title_list = [title.text for title in soup.find_all("yt-formatted-string", id="video-title")]
+    channel_name_list = [channel_name.text for text_container in soup.find_all("div", {"id": "text-container"}) for
+                         channel_name in text_container.find_all('a')]
+    live_viewers_list = [viewers.text for viewers in
+                         soup.find_all("span", class_="inline-metadata-item style-scope ytd-video-meta-block")]
+
+    # 만약 방금 종료된 방송이 있다면, 제외시켜야 하므로 정규식을 사용해서 필터링합니다.
+    filtered_data = [(thumb, title, channel, viewers) for thumb, title, channel, viewers in
+                     zip(thumbnail_list, title_list, channel_name_list, live_viewers_list) if
+                     not re.search(r'Streamed \d+', viewers)]
+
+    # dictionary list로 바꿔서 제공해줍니다.
+    live_data_list = [
+        {
+            'thumbnail': data[0],
+            'title': data[1],
+            'channel_name': data[2],
+            'viewers': data[3],
+        } for data in filtered_data
+    ]
+
+    return live_data_list
 
 
-def get_live_details(driver: WebDriver) -> Tuple[List[Any], List[str], List[str], List[str]]:
-    """
-    thumbnail_list : 썸네일 이미지 링크 리스트
-    title_list : 방송 제목 리스트
-    channel_name_list : 채널 주인장 이름 리스트
-    live_viewers_list : 시청자 수 리스트
-    """
-    page: str = driver.page_source
-    soup: BeautifulSoup = BeautifulSoup(page, "html.parser")
-    thumbnails, titles, channel_names, live_viewers = [], [], [], []
-
-    for thumbnail, title, channel_name, viewers in zip(
-            soup.find_all("ytd-thumbnail"),
-            soup.find_all("yt-formatted-string", id="video-title"),
-            soup.find_all("div", {"id": "text-container"}),
-            soup.find_all("span", class_="inline-metadata-item style-scope ytd-video-meta-block")
-    ):
-        viewer_count_text = viewers.text.strip()
-        if 'watching' in viewer_count_text:
-            viewer_count = parse_viewer_count(viewer_count_text)
-            img = thumbnail.find("img", class_="yt-core-image")
-            if img and 'src' in img.attrs:
-                thumbnails.append(img['src'])
-            titles.append(title.text.strip())
-            channel_names.append(channel_name.find('a').text.strip())
-            live_viewers.append(viewer_count_text)
-
-    return thumbnails, titles, channel_names, live_viewers
-
-
-def main(driver: WebDriver):
-    url: str = "https://www.youtube.com/channel/UC4R8DWoMoI7CAwX8_LjQHig"
+def main(driver):
+    url = "https://www.youtube.com/channel/UC4R8DWoMoI7CAwX8_LjQHig"
     driver.get(url)
-    time.sleep(2)
+    time.sleep(5)
 
     try:
-        # 모두보기 버튼 클릭
         press_show_all(driver)
-
-        # 페이지 끝까지 내리기
         scroll(driver)
-
-        thumbnail_list, title_list, channel_name_list, live_viewers_list = get_live_details(driver)
-        for i, el in enumerate(thumbnail_list):
-            print(f"{i}th: {el}")
-
-        for i, el in enumerate(title_list):
-            print(f"{i}th: {el}")
-
-        for i, el in enumerate(channel_name_list):
-            print(f"{i}th: {el}")
-
-        for i, el in enumerate(live_viewers_list):
-            print(f"{i}th: {el}")
+        live_data_list = get_live_details(driver)
+        for live_data in live_data_list:
+            for key, value in live_data.items():
+                print(f"{key}: {value}")
 
     except Exception as e:
         print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
-    # 참고 블로그 :
-    # https://m.blog.naver.com/ksg97031/222070026332
-    # https://m.blog.naver.com/lmj4160/222462966573
-    driver: WebDriver = init_driver()
+    driver = init_driver()
     main(driver)
