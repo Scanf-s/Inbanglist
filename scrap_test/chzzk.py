@@ -5,11 +5,10 @@ from typing import List, Tuple, Any
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 
 
@@ -33,39 +32,31 @@ def init_driver() -> WebDriver:
     return new_driver
 
 
-def scroll(driver: WebDriver):
-    """
-    치지직 라이브 페이지를 실제 사람이 사용하는 것처럼 스크롤하는 함수
-    """
-    last_height: int = driver.execute_script("return document.documentElement.scrollHeight")
+def scroll(driver):
+    elem = driver.find_element(By.TAG_NAME, "body")
 
-    for i in range(5):
-        # 랜덤한 높이로 스크롤
-        scroll_height: int = uniform(200, 800)
-        driver.execute_script(f"window.scrollBy(0, {scroll_height});")
+    no_of_pagedowns = 7
+    last_height = driver.execute_script("return document.documentElement.scrollHeight")
 
-        # 랜덤한 대기 시간
-        time.sleep(uniform(1.0, 3.0))
+    last_chk_cnt = 0
+    while no_of_pagedowns:
 
-        # 새로운 높이 확인
-        new_height: int = driver.execute_script("return document.documentElement.scrollHeight")
-        if new_height == last_height:
-            # 높이가 변하지 않았다면 마지막 시도로 스크롤
-            driver.execute_script("window.scrollBy(0, document.documentElement.scrollHeight);")
-            time.sleep(uniform(1.0, 3.0))
-            new_height = driver.execute_script("return document.documentElement.scrollHeight")
-            if new_height == last_height:
-                break
-        last_height = new_height
+        elem.send_keys(Keys.PAGE_DOWN)
+        time.sleep(0.5)
 
-        # 특정 요소가 나타날 때까지 기다리기
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "yt-core-image"))
-            )
-        except Exception as e:
-            print(f"Error during waiting for new content: {e}")
+        new_height = driver.execute_script("return document.documentElement.scrollHeight")
+
+        if last_height == new_height:
+            last_chk_cnt += 1
+
+        else:
+            last_chk_cnt = 0
+
+        if last_chk_cnt > 5:
             break
+
+        last_height = new_height
+        no_of_pagedowns -= 1
 
 
 def get_live_details(driver: WebDriver):
@@ -89,6 +80,8 @@ def get_live_details(driver: WebDriver):
         img = thumbnail.find("img")
         if img and 'src' in img.attrs:
             thumbnails.append(img['src'])
+        else:
+            thumbnails.append("성인인증걸려있음")
         titles.append(title.text.strip("라이브 엔드로 이동"))
         channel_names.append(channel_name.text.strip().strip('\n'))
         live_viewers.append(live_viewer.text.strip())
