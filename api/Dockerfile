@@ -27,6 +27,7 @@ RUN python -m venv /py && \
     apk add --update --no-cache jpeg-dev zlib zlib-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base musl-dev linux-headers && \
+    /py/bin/pip install --upgrade pip setuptools && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ "$DEV" = "true" ]; then /py/bin/pip install -r /tmp/requirements.dev.txt ; fi && \
     rm -rf /tmp && \
