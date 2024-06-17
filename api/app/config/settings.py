@@ -44,9 +44,16 @@ CUSTOM_USER_APPS = [
     'drf_spectacular',  # DRF-Spectacular
     'corsheaders',  # Django-CORS-Headers
     'common.apps.CommonConfig', # common app
+    'afreecatv.apps.AfreecatvConfig', # AfreecaTV app
+    'youtube.apps.YoutubeConfig', # YouTube app
+    'chzzk.apps.ChzzkConfig', # Chzzk app
 ]
 
 INSTALLED_APPS = DJANGO_SYSTEM_APPS + CUSTOM_USER_APPS
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
