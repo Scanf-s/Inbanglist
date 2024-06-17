@@ -11,9 +11,6 @@ const StreamList = ({ platform }) => {
         fetchData();
     }, [platform, currentPage]);
 
-    // /api/v1/youtube
-    // /api/v1/chzzk
-    // /api/v1/afreecatv/
     const fetchData = async () => {
         try {
             const response = await fetch('/data/data.json');
@@ -38,9 +35,11 @@ const StreamList = ({ platform }) => {
     return (
         <div>
             <h1 className='text-2xl p-3'>{platform}</h1>
-            {streams.map((stream) => (
-                <StreamItem key={stream.index} stream={stream} />
-            ))}
+            <div className='flex flex-col gap-6'>
+                {streams.map((stream) => (
+                    <StreamItem key={stream.index} stream={stream} />
+                ))}
+            </div>
         </div>
     );
 };
