@@ -19,7 +19,7 @@
 
 ### 역할 분담
 
-- 양의종 : Backend
+- 양의종 : Backend, 기획
   - AWS 인프라 구성
   - 개인 Docker 환경 구성 및 docker-compose 작성
   - Data scraping 소스코드 개발
