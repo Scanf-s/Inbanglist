@@ -27,8 +27,8 @@ admin_urls = [
 ]
 
 api_urls = [
-    # path('api/v1/afreecatv/', include('afreecatv.urls')),
-    # path('api/v1/chzzk/', include('chzzk.urls')),
+    path('api/v1/afreecatv/', include('afreecatv.urls')),
+    path('api/v1/chzzk/', include('chzzk.urls')),
     path('api/v1/youtube/', include('youtube.urls')),
 ]
 
