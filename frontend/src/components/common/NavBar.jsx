@@ -1,6 +1,9 @@
 const NavBar = ({ toggleDarkMode, darkMode }) => {
     return (
-        <div className={`flex justify-between ${darkMode ? 'bg-slate-800' : 'bg-slate-200'} p-4`}>
+        <div
+            className={`flex justify-between ${
+                darkMode ? 'bg-slate-800' : 'bg-slate-200'
+            } p-4 h-[68px]`}>
             <h1 className={`text-3xl ${darkMode ? 'text-white' : 'text-black'}`}>StreamView</h1>
             <div
                 className={`w-12 h-7 p-2 bg-slate-400 ${
