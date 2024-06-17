@@ -8,6 +8,7 @@ const Layout = ({ darkMode, toggleDarkMode }) => {
       <div className={`w-full ${darkMode ? 'bg-slate-700' : 'bg-white'}`}>
         <Outlet />
       </div>
+
     </div>
   )
 }
