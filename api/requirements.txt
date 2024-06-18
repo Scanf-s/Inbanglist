@@ -4,3 +4,6 @@ gunicorn>=22.0.0,<23.0.0 # Python WSGI(웹 서버 게이트웨이 인터페이�
 psycopg2-binary>=2.9.9,<3.0.0  # Psycopg2-binary : For PostgreSQL, connector
 drf-spectacular>=0.27.2,<0.28.0  # DRF-Spectacular : For API Documentation
 django-cors-headers>=3.13.0,<4.0.0  # Django-CORS-Headers: For handling CORS (Frontend 도메인에서 Backend 도메인에 연결할 때 사용)
+django-extensions>=3.2.3,<3.3.0  # Django-Extensions : For debugging
+djangorestframework-simplejwt>=5.2.0,<5.3.0  # Django-RestFramework-SimpleJWT : For JWT
+Werkzeug>=3.0.3,<3.1.0 # Werkzeug : For django-extensions

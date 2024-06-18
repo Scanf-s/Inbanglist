@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1
 
 # 로컬 파일 시스템의 requirements.txt 파일을 컨테이너로 복사
 COPY ./requirements.txt /tmp/requirements.txt
+COPY ./requirements.dev.txt /tmp/requirements.dev.txt
 COPY ./app /app
 
 # 작업 디렉토리를 /app으로 설정
@@ -17,7 +18,7 @@ WORKDIR /app
 # curl 설치를 위한 추가
 RUN apk add --no-cache curl
 
-# DEV 인수를 false로 설정 (기본값)
+# DEV 인수를 false로 설정 (기본값, docker-compose 파일에서 변경해주면 된다.)
 ARG DEV=false
 
 # 패키지 설치 및 이미지 최적화
@@ -26,6 +27,7 @@ RUN python -m venv /py && \
     apk add --update --no-cache jpeg-dev zlib zlib-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base musl-dev linux-headers && \
+    /py/bin/pip install --upgrade pip setuptools && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ "$DEV" = "true" ]; then /py/bin/pip install -r /tmp/requirements.dev.txt ; fi && \
     rm -rf /tmp && \
@@ -45,4 +47,4 @@ EXPOSE 8000
 USER django-user
 
 # Django 프로젝트 실행
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application", "--workers", "4", "--log-level", "debug"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application", "--workers", "6", "--timeout", "120", "--log-level", "debug"]
