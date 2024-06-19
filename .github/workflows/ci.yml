@@ -1,53 +1,28 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - backend  # backend 브랜치에서 푸시가 발생했을 때
-  pull_request:
-    branches:
-      - backend  # backend 브랜치로 PR이 생성되었을 때
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Docker
-      uses: docker/setup-buildx-action@v1
+    - name: Set up Docker Compose
+      run: docker-compose up -d
 
-    - name: Install Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose
+    - name: Run Black
+      run: docker-compose run --rm api sh -c 'black . --check'
 
-    - name: Create .env file
-      run: |
-        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" > /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DB_NAME=${{ secrets.RDS_DB_NAME }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DB_USER=${{ secrets.RDS_USER }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DB_HOST=${{ secrets.RDS_HOST }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
-        echo "DB_PORT=${{ secrets.RDS_PORT }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+    - name: Run Isort
+      run: docker-compose run --rm api sh -c 'isort . --check-only'
 
-    - name: Build and run Docker containers
-      run: |
-        docker-compose -f docker-compose.yml up --build -d
-
-    - name: Run linters and type checks
-      run: |
-        docker-compose run api sh -c "pip install -r requirements.dev.txt && black --check . && isort --check-only . && mypy ."
-
-    - name: Run tests
-      run: |
-        docker-compose run api sh -c "cp config/settings.py config/settings_ci.py"
-        docker-compose run api sh -c "sed -i 's/DEBUG = True/DEBUG = False/' config/settings_ci.py"
-        docker-compose run api sh -c "sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\"localhost\"]/' config/settings_ci.py"
-        docker-compose run api sh -c "sed -i \"s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/\" config/settings_ci.py"
-        docker-compose run api sh -c "python manage.py migrate --settings=config.settings_ci"
-        docker-compose run api sh -c "python manage.py test --settings=config.settings_ci"
+    - name: Run Mypy
+      run: docker-compose run --rm api sh -c 'mypy --config-file /app/mypy.ini .'

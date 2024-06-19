@@ -57,4 +57,11 @@ Docker
 
 ## 5. 기능 소개
 
-## 6. 추가....
+## 6. 백엔드 개발 도구 사용 방법
+```python
+docker-compose run --rm api sh -c 'mypy .' # 정적 타입 검사기
+docker-compose run --rm api sh -c 'black . --check-only' # 포매팅 할 수 있는 코드 탐색(수정은 안함)
+docker-compose run --rm api sh -c 'black .' # 코드 포매팅 실행
+docker-compose run --rm api sh -c 'isort . --check-only' # python import 정렬 가능한 파일 탐색 (수정은 안함)
+docker-compose run --rm api sh -c 'isort .' # import 정렬 실행
+```
