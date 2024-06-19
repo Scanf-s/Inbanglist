@@ -2,8 +2,5 @@ black>=24.4.2,<25.0.0 # Black : For code formatting
 isort>=5.13.2,<5.14.0 # Isort : Library to sort Python imports
 mypy>=1.10.0,<1.11.0 # Mypy : Library to add annotations and type check
 django-stubs>=5.0.2 # type stubs and a custom mypy plugin to provide more precise static types and type inference for Django framework
-<<<<<<< HEAD
 djangorestframework-stubs # Mypy stubs for Django REST Framework. Supports Python 3.8 and up.
-=======
-djangorestframework-stubs # Mypy stubs for Django REST Framework. Supports Python 3.8 and up.
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
+
