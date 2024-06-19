@@ -26,14 +26,14 @@ jobs:
 
     - name: Create .env file
       run: |
-        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" > api/.env
-        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> api/.env
-        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> api/.env
-        echo "DB_NAME=${{ secrets.RDS_DB_NAME }}" >> api/.env
-        echo "DB_USER=${{ secrets.RDS_USER }}" >> api/.env
-        echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> api/.env
-        echo "DB_HOST=${{ secrets.RDS_HOST }}" >> api/.env
-        echo "DB_PORT=${{ secrets.RDS_PORT }}" >> api/.env
+        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" > /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DB_NAME=${{ secrets.RDS_DB_NAME }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DB_USER=${{ secrets.RDS_USER }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DB_HOST=${{ secrets.RDS_HOST }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
+        echo "DB_PORT=${{ secrets.RDS_PORT }}" >> /home/runner/work/live_streaming_lists/live_streaming_lists/.env
 
     - name: Build and run Docker containers
       run: |
