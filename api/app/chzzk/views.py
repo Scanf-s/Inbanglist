@@ -33,4 +33,5 @@ class ChzzkListAPI(viewsets.ViewSet):
     def retrieve(self, request, pk: Optional[int] = None) -> Response:
         instance: CommonModel = get_object_or_404(self.queryset, id=pk)
         serializer: LiveStreamingModelSerializer = LiveStreamingModelSerializer(instance=instance)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
