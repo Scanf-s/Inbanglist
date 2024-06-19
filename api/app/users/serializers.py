@@ -1,10 +1,4 @@
-from typing import Dict
-
 from rest_framework import serializers
-<<<<<<< HEAD
-=======
-
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -24,10 +18,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password_verify")  # validated_data에서 password_verify를 제거
         user = User.objects.create_user(email=validated_data["email"], password=validated_data["password"])
-<<<<<<< HEAD
-=======
-
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
         return user
 
     class Meta:
@@ -56,10 +46,6 @@ class UserLogoutSerializer(serializers.Serializer):
         if not token:
             raise serializers.ValidationError("Token not found")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
         try:
             # 유효한 토큰인지 검증
             RefreshToken(token)
@@ -71,10 +57,6 @@ class UserLogoutSerializer(serializers.Serializer):
         fields = ["refresh"]
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
 class UserDeleteSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -96,10 +78,7 @@ class UserDeleteSerializer(serializers.Serializer):
             raise serializers.ValidationError("User not found")
         except TokenError:
             raise serializers.ValidationError("Invalid token or expired")
-<<<<<<< HEAD
-=======
 
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
         return attrs
 
     class Meta:

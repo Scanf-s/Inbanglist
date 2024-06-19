@@ -6,21 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chzzk', '0001_initial'),
+        ("chzzk", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='chzzkmodel',
-            name='live_viewer',
+            model_name="chzzkmodel",
+            name="live_viewer",
         ),
         migrations.RemoveField(
-            model_name='chzzkmodel',
-            name='urls',
+            model_name="chzzkmodel",
+            name="urls",
         ),
         migrations.AddField(
-            model_name='chzzkmodel',
-            name='concurrent_viewers',
+            model_name="chzzkmodel",
+            name="concurrent_viewers",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

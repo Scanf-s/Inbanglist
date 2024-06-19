@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0001_initial'),
-        ('youtube', '0003_remove_youtubemodel_details_youtubestreamdetails'),
+        ("common", "0001_initial"),
+        ("youtube", "0003_remove_youtubemodel_details_youtubestreamdetails"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='YoutubeStreamDetails',
+            name="YoutubeStreamDetails",
         ),
     ]

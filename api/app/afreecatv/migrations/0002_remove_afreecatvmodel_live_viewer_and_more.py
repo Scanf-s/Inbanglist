@@ -6,21 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('afreecatv', '0001_initial'),
+        ("afreecatv", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='afreecatvmodel',
-            name='live_viewer',
+            model_name="afreecatvmodel",
+            name="live_viewer",
         ),
         migrations.RemoveField(
-            model_name='afreecatvmodel',
-            name='urls',
+            model_name="afreecatvmodel",
+            name="urls",
         ),
         migrations.AddField(
-            model_name='afreecatvmodel',
-            name='concurrent_viewers',
+            model_name="afreecatvmodel",
+            name="concurrent_viewers",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

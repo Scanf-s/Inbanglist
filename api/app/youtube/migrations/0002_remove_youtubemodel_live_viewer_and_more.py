@@ -7,32 +7,41 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0001_initial'),
-        ('youtube', '0001_initial'),
+        ("common", "0001_initial"),
+        ("youtube", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='youtubemodel',
-            name='live_viewer',
+            model_name="youtubemodel",
+            name="live_viewer",
         ),
         migrations.RemoveField(
-            model_name='youtubemodel',
-            name='urls',
+            model_name="youtubemodel",
+            name="urls",
         ),
         migrations.AddField(
-            model_name='youtubemodel',
-            name='concurrent_viewers',
+            model_name="youtubemodel",
+            name="concurrent_viewers",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='youtubemodel',
-            name='details',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='youtube_stream', to='common.youtubestreamdetails'),
+            model_name="youtubemodel",
+            name="details",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="youtube_stream",
+                to="common.youtubestreamdetails",
+            ),
         ),
         migrations.AddField(
-            model_name='youtubemodel',
-            name='platform',
-            field=models.CharField(choices=[('youtube', 'YouTube'), ('chzzk', 'Chzzk'), ('afreecatv', 'AfreecaTV')], default='youtube', max_length=50),
+            model_name="youtubemodel",
+            name="platform",
+            field=models.CharField(
+                choices=[("youtube", "YouTube"), ("chzzk", "Chzzk"), ("afreecatv", "AfreecaTV")],
+                default="youtube",
+                max_length=50,
+            ),
         ),
     ]

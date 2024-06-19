@@ -18,10 +18,7 @@ class UserRegisterAPI(generics.CreateAPIView):
     """
     사용자 회원가입 관련 API
     """
-<<<<<<< HEAD
 
-=======
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
     serializer_class = UserRegisterSerializer
 
     def post(self, request, *args, **kwargs):
@@ -86,10 +83,7 @@ class UserLogoutAPI(generics.GenericAPIView):
                 return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
             except TokenError:
                 return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< HEAD
-=======
 
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -109,8 +103,5 @@ class UserDeleteAPI(generics.GenericAPIView):
                 return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
             except TokenError:
                 return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< HEAD
-=======
 
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

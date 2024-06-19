@@ -7,22 +7,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('youtube', '0002_remove_youtubemodel_live_viewer_and_more'),
+        ("youtube", "0002_remove_youtubemodel_live_viewer_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='youtubemodel',
-            name='details',
+            model_name="youtubemodel",
+            name="details",
         ),
         migrations.CreateModel(
-            name='YoutubeStreamDetails',
+            name="YoutubeStreamDetails",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.TextField(blank=True, null=True)),
-                ('streaming_link', models.URLField(max_length=1024)),
-                ('channel_descript', models.TextField(blank=True, null=True)),
-                ('youtube_model', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='details', to='youtube.youtubemodel')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("description", models.TextField(blank=True, null=True)),
+                ("streaming_link", models.URLField(max_length=1024)),
+                ("channel_descript", models.TextField(blank=True, null=True)),
+                (
+                    "youtube_model",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="details",
+                        to="youtube.youtubemodel",
+                    ),
+                ),
             ],
         ),
     ]

@@ -16,10 +16,6 @@ from pathlib import Path  # 파일 경로 다루는 모듈
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent  # 프로젝트 루트 디렉토리
-<<<<<<< HEAD
-
-=======
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/

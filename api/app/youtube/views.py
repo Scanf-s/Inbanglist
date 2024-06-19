@@ -17,10 +17,6 @@ class YoutubeListAPI(viewsets.ViewSet):
 
     queryset: QuerySet = CommonModel.objects.filter(platform="youtube")
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
     @extend_schema(
         responses={200: LiveStreamingModelSerializer(many=True)},
     )
@@ -37,8 +33,5 @@ class YoutubeListAPI(viewsets.ViewSet):
     def retrieve(self, request, pk: Optional[int] = None) -> Response:
         instance: CommonModel = get_object_or_404(self.queryset, id=pk)
         serializer: LiveStreamingModelSerializer = LiveStreamingModelSerializer(instance=instance)
-<<<<<<< HEAD
-=======
 
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
         return Response(serializer.data, status=status.HTTP_200_OK)

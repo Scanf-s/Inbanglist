@@ -1,9 +1,6 @@
 from django.db import models
 from django.db.models import CharField, DateTimeField, PositiveIntegerField, TextField, URLField
-<<<<<<< HEAD
 
-=======
->>>>>>> 05475956a48e8c6c5d0a2cb9e13625ce4b9b16ec
 from common.platforms import Platforms
 
 
