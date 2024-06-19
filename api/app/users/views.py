@@ -18,6 +18,7 @@ class UserRegisterAPI(generics.CreateAPIView):
     """
     사용자 회원가입 관련 API
     """
+
     serializer_class = UserRegisterSerializer
 
     def post(self, request, *args, **kwargs):

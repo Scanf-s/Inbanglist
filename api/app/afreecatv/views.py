@@ -30,7 +30,6 @@ class AfreecaTvListAPI(viewsets.ViewSet):
     @extend_schema(
         responses={200: LiveStreamingModelSerializer},
     )
-
     def retrieve(self, request, pk: Optional[int] = None) -> Response:
         instance: CommonModel = get_object_or_404(self.queryset, id=pk)
         serializer: LiveStreamingModelSerializer = LiveStreamingModelSerializer(instance=instance)

@@ -17,7 +17,6 @@ class YoutubeListAPI(viewsets.ViewSet):
 
     queryset: QuerySet = CommonModel.objects.filter(platform="youtube")
 
-
     @extend_schema(
         responses={200: LiveStreamingModelSerializer(many=True)},
     )
