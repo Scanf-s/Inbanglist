@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - backend # backend 브랜치로 Push가 발생했을 때
+      - backend  # backend 브랜치에서 푸시가 발생했을 때
   pull_request:
     branches:
       - backend  # backend 브랜치로 PR이 생성되었을 때
@@ -16,57 +16,38 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
+    - name: Set up Docker
       uses: docker/setup-buildx-action@v1
 
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.10'  # Python 버전을 3.10으로 설정합니다.
-
-    - name: Install dependencies
+    - name: Install Docker Compose
       run: |
-        python -m pip install --upgrade pip
-        pip install poetry
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
 
     - name: Create .env file
       run: |
-        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
-        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> .env
-        echo "DB_NAME=${{ secrets.RDS_DB_NAME }}" >> .env
-        echo "DB_USER=${{ secrets.RDS_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
-        echo "DB_HOST=${{ secrets.RDS_HOST }}" >> .env
-        echo "DB_PORT=${{ secrets.RDS_PORT }}" >> .env
+        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" > api/.env
+        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> api/.env
+        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> api/.env
+        echo "DB_NAME=${{ secrets.RDS_DB_NAME }}" >> api/.env
+        echo "DB_USER=${{ secrets.RDS_USER }}" >> api/.env
+        echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> api/.env
+        echo "DB_HOST=${{ secrets.RDS_HOST }}" >> api/.env
+        echo "DB_PORT=${{ secrets.RDS_PORT }}" >> api/.env
 
     - name: Build and run Docker containers
       run: |
         docker-compose -f docker-compose.yml up --build -d
 
-    - name: Install project dependencies
-      run: |
-        docker-compose run api poetry install
-
     - name: Run linters and type checks
       run: |
-        docker-compose run api poetry run black --check .
-        docker-compose run api poetry run isort --check-only .
-        docker-compose run api poetry run mypy .
+        docker-compose run api sh -c "pip install -r requirements.dev.txt && black --check . && isort --check-only . && mypy ."
 
     - name: Run tests
       run: |
-        docker-compose run api cp config/settings.py config/settings_ci.py
-        docker-compose run api sed -i 's/DEBUG = True/DEBUG = False/' config/settings_ci.py
-        docker-compose run api sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = ["localhost"]/' config/settings_ci.py
-        docker-compose run api sed -i "s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/" config/settings_ci.py
-        docker-compose run api poetry run python manage.py migrate --settings=config.settings_ci
-        docker-compose run api poetry run python manage.py test --settings=config.settings_ci
+        docker-compose run api sh -c "cp config/settings.py config/settings_ci.py"
+        docker-compose run api sh -c "sed -i 's/DEBUG = True/DEBUG = False/' config/settings_ci.py"
+        docker-compose run api sh -c "sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\"localhost\"]/' config/settings_ci.py"
+        docker-compose run api sh -c "sed -i \"s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/\" config/settings_ci.py"
+        docker-compose run api sh -c "python manage.py migrate --settings=config.settings_ci"
+        docker-compose run api sh -c "python manage.py test --settings=config.settings_ci"
