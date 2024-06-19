@@ -1,7 +1,6 @@
 from django.urls import path
 
-from users.views import (UserDeleteAPI, UserLoginAPI, UserLogoutAPI,
-                         UserRegisterAPI)
+from users.views import UserDeleteAPI, UserLoginAPI, UserLogoutAPI, UserRegisterAPI
 
 urlpatterns = [
     path("register/", UserRegisterAPI.as_view(), name="user_register"),

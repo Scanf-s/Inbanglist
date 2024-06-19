@@ -3,8 +3,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
-from .serializers import (UserDeleteSerializer, UserLoginSerializer,
-                          UserLogoutSerializer, UserRegisterSerializer)
+from .serializers import UserDeleteSerializer, UserLoginSerializer, UserLogoutSerializer, UserRegisterSerializer
 
 
 def get_tokens_for_user(user: User):
@@ -81,13 +80,9 @@ class UserLogoutAPI(generics.GenericAPIView):
             try:
                 token = RefreshToken(serializer.validated_data["refresh"])
                 token.blacklist()
-                return Response(
-                    {"message": "Logout successful"}, status=status.HTTP_200_OK
-                )
+                return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
             except TokenError:
-                return Response(
-                    {"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -102,15 +97,9 @@ class UserDeleteAPI(generics.GenericAPIView):
                 token.blacklist()
                 user = User.objects.get(email=serializer.validated_data["email"])
                 user.delete()
-                return Response(
-                    {"message": "User deleted successfully"}, status=status.HTTP_200_OK
-                )
+                return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
-                return Response(
-                    {"message": "User not found"}, status=status.HTTP_404_NOT_FOUND
-                )
+                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
             except TokenError:
-                return Response(
-                    {"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

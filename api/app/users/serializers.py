@@ -18,12 +18,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop(
-            "password_verify"
-        )  # validated_data에서 password_verify를 제거
-        user = User.objects.create_user(
-            email=validated_data["email"], password=validated_data["password"]
-        )
+        validated_data.pop("password_verify")  # validated_data에서 password_verify를 제거
+        user = User.objects.create_user(email=validated_data["email"], password=validated_data["password"])
         return user
 
     class Meta:
@@ -40,9 +36,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class UserLogoutSerializer(serializers.Serializer):
-    refresh = (
-        serializers.CharField()
-    )  # 클라이언트가 로그아웃 요청 시 제공하는 Refresh Token (CharField로 받는다)
+    refresh = serializers.CharField()  # 클라이언트가 로그아웃 요청 시 제공하는 Refresh Token (CharField로 받는다)
 
     def validate(self, attrs):
         """

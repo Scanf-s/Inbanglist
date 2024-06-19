@@ -1,6 +1,5 @@
 from django.db import models
-from django.db.models import (CharField, DateTimeField, PositiveIntegerField,
-                              TextField, URLField)
+from django.db.models import CharField, DateTimeField, PositiveIntegerField, TextField, URLField
 
 from common.platforms import Platforms
 
@@ -17,12 +16,8 @@ class CommonModel(models.Model):
     channel_link: URLField = models.URLField(
         max_length=1024, null=False
     )  # 유튜브 : 채널 링크, 치지직 : 프로필 링크, 아프리카TV : 방송국 링크
-    channel_description: TextField = models.TextField(
-        null=True
-    )  # 채널(프로필, 방송국)에 써있는 소개글 담는 필드
-    followers: PositiveIntegerField = models.PositiveIntegerField(
-        default=0, null=False
-    )  # 구독자, 팔로워, 즐겨찾기 수
+    channel_description: TextField = models.TextField(null=True)  # 채널(프로필, 방송국)에 써있는 소개글 담는 필드
+    followers: PositiveIntegerField = models.PositiveIntegerField(default=0, null=False)  # 구독자, 팔로워, 즐겨찾기 수
 
     created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
     updated_at: DateTimeField = models.DateTimeField(auto_now=True)

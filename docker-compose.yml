@@ -9,6 +9,7 @@ services:
         - DEV=true
     volumes:
       - ./api/app:/app
+      - ./pyproject.toml:/app/pyproject.toml
       - ./mypy.ini:/app/mypy.ini
     ports:
       - "8000:8000"
