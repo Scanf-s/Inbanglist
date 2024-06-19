@@ -1,1 +1,3 @@
 black>=24.4.2,<25.0.0 # Black : For code formatting
+isort>=5.13.2,<5.14.0 # Isort : Library to sort Python imports
+mypy>=1.10.0,<1.11.0 # Mypy : Library to add annotations and type check
