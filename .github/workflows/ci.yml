@@ -1,6 +1,12 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - backend # backend 브랜치로 Push가 발생했을 때
+  pull_request:
+    branches:
+      - backend  # backend 브랜치로 PR이 생성되었을 때
 
 jobs:
   build:
@@ -48,19 +54,19 @@ jobs:
 
     - name: Install project dependencies
       run: |
-        docker-compose exec api poetry install
+        docker-compose run api poetry install
 
     - name: Run linters and type checks
       run: |
-        docker-compose exec api poetry run black --check .
-        docker-compose exec api poetry run isort --check-only .
-        docker-compose exec api poetry run mypy .
+        docker-compose run api poetry run black --check .
+        docker-compose run api poetry run isort --check-only .
+        docker-compose run api poetry run mypy .
 
     - name: Run tests
       run: |
-        docker-compose exec api cp config/settings.py config/settings_ci.py
-        docker-compose exec api sed -i 's/DEBUG = True/DEBUG = False/' config/settings_ci.py
-        docker-compose exec api sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = ["localhost"]/' config/settings_ci.py
-        docker-compose exec api sed -i "s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/" config/settings_ci.py
-        docker-compose exec api poetry run python manage.py migrate --settings=config.settings_ci
-        docker-compose exec api poetry run python manage.py test --settings=config.settings_ci
+        docker-compose run api cp config/settings.py config/settings_ci.py
+        docker-compose run api sed -i 's/DEBUG = True/DEBUG = False/' config/settings_ci.py
+        docker-compose run api sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = ["localhost"]/' config/settings_ci.py
+        docker-compose run api sed -i "s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/" config/settings_ci.py
+        docker-compose run api poetry run python manage.py migrate --settings=config.settings_ci
+        docker-compose run api poetry run python manage.py test --settings=config.settings_ci
