@@ -24,12 +24,23 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.12'
+        python-version: '3.10'  # Python 버전을 3.10으로 설정합니다.
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install poetry
+
+    - name: Create .env file
+      run: |
+        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
+        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> .env
+        echo "DB_NAME=${{ secrets.RDS_DB_NAME }}" >> .env
+        echo "DB_USER=${{ secrets.RDS_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
+        echo "DB_HOST=${{ secrets.RDS_HOST }}" >> .env
+        echo "DB_PORT=${{ secrets.RDS_PORT }}" >> .env
 
     - name: Build and run Docker containers
       run: |
@@ -46,19 +57,10 @@ jobs:
         docker-compose exec api poetry run mypy .
 
     - name: Run tests
-      env:
-        RDS_HOST: ${{ secrets.RDS_HOST }}
-        RDS_PORT: ${{ secrets.RDS_PORT }}
-        RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
-        RDS_USER: ${{ secrets.RDS_USER }}
-        RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-        DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
-        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       run: |
-        cp api/app/config/settings.py api/app/config/settings_ci.py
-        sed -i 's/DEBUG = True/DEBUG = False/' api/app/config/settings_ci.py
-        sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = ["localhost"]/' api/app/config/settings_ci.py
-        sed -i "s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/" api/app/config/settings_ci.py
+        docker-compose exec api cp config/settings.py config/settings_ci.py
+        docker-compose exec api sed -i 's/DEBUG = True/DEBUG = False/' config/settings_ci.py
+        docker-compose exec api sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = ["localhost"]/' config/settings_ci.py
+        docker-compose exec api sed -i "s/DATABASES = .*/DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': '${{ secrets.RDS_DB_NAME }}', 'USER': '${{ secrets.RDS_USER }}', 'PASSWORD': '${{ secrets.RDS_PASSWORD }}', 'HOST': '${{ secrets.RDS_HOST }}', 'PORT': '${{ secrets.RDS_PORT }}'}}/" config/settings_ci.py
         docker-compose exec api poetry run python manage.py migrate --settings=config.settings_ci
         docker-compose exec api poetry run python manage.py test --settings=config.settings_ci
