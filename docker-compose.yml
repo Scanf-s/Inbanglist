@@ -1,4 +1,4 @@
-version: "3.11"
+version: "3.9"
 services:
   api:
     env_file:
@@ -9,6 +9,8 @@ services:
         - DEV=true
     volumes:
       - ./api/app:/app
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./mypy.ini:/app/mypy.ini
     ports:
       - "8000:8000"
     environment:
