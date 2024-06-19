@@ -1,4 +1,8 @@
 from django.contrib import admin
+from common.models import CommonModel
+
+from common.models import CommonModel
+
 
 from common.models import CommonModel
 
