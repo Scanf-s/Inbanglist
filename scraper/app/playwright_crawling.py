@@ -7,11 +7,7 @@ from playwright_modules.chzzk import chzzk_crawling
 from playwright_modules.youtube import youtube_crawling
 
 from bs4 import BeautifulSoup
-
-afreecatv_datas = []
-youtube_datas = []
-chzzk_datas = []
-browsers = []
+from db import connector
 
 async def main():
     async with async_playwright() as playwright:
@@ -25,9 +21,15 @@ async def main():
         tasks.append(asyncio.create_task(youtube_crawling(await context.new_page(), BeautifulSoup)))
         tasks.append(asyncio.create_task(chzzk_crawling(await context.new_page(), BeautifulSoup)))
 
-        await asyncio.gather(*tasks)
-
+        results = await asyncio.gather(*tasks)
         await browser.close()
+
+        results[0].insert(0, 'afreecatv')
+        results[1].insert(0, 'youtube')
+        results[2].insert(0, 'chzzk')
+
+        connector.insert(results)
+
 
 if __name__ == "__main__":
     start =  time.time()
