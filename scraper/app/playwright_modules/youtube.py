@@ -27,25 +27,22 @@ async def scroll(page):
         last_height = new_height
         no_of_pagedowns -= 1
 
-async def youtube_crawling(page):
+async def youtube_crawling(page, soup):
     await page.goto("https://www.youtube.com/channel/UC4R8DWoMoI7CAwX8_LjQHig")
     await press_show_all(page)
     await scroll(page)
+    
+    html = await page.content()
+    soup = soup(html, "html.parser")
 
-    yt_images = await page.query_selector_all("yt-image img")
-    thumbnail_list = [await img.get_attribute('src') for img in yt_images if await img.get_attribute('src')]
-
-    links = await page.query_selector_all("a.yt-simple-endpoint.inline-block.style-scope.ytd-thumbnail")
-    link_list = [await link.get_attribute('href') for link in links if await link.get_attribute('href')]
-
-    titles = await page.query_selector_all("yt-formatted-string#video-title")
-    title_list = [await title.text_content() for title in titles]
-
-    text_containers = await page.query_selector_all("div#text-container a")
-    channel_name_list = [await channel_name.text_content() for channel_name in text_containers]
-
-    viewers = await page.query_selector_all("span.inline-metadata-item.style-scope.ytd-video-meta-block")
-    live_viewers_list = [await viewer.text_content() for viewer in viewers]
+    thumbnail_list = [img['src'] for yt_image in soup.find_all("yt-image") for img in yt_image.find_all("img") if
+                      'src' in img.attrs]
+    link_list = [link.get('href') for link in soup.find_all("a", class_="yt-simple-endpoint inline-block style-scope ytd-thumbnail") if link.get('href')]
+    title_list = [title.text for title in soup.find_all("yt-formatted-string", id="video-title")]
+    channel_name_list = [channel_name.text for text_container in soup.find_all("div", {"id": "text-container"}) for
+                         channel_name in text_container.find_all('a')]
+    live_viewers_list = [viewers.text for viewers in
+                         soup.find_all("span", class_="inline-metadata-item style-scope ytd-video-meta-block")]
 
     print("Links:", len(link_list))
     print("Thumbnails:", len(thumbnail_list))

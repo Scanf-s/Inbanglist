@@ -2,7 +2,7 @@ from random import uniform
 
 async def scroll(page):
     last_height = await page.evaluate("document.documentElement.scrollHeight")
-    more_cnt = 2
+    more_cnt = 6
 
     for _ in range(10):
         # 랜덤한 높이로 스크롤
@@ -29,7 +29,7 @@ async def scroll(page):
 
         last_height = new_height
 
-async def afreecatv_crawling(page):
+async def afreecatv_crawling(page, soup):
     await page.goto("https://www.afreecatv.com/?hash=all")
     await scroll(page)
 
@@ -39,27 +39,29 @@ async def afreecatv_crawling(page):
     channel_names = []
     live_viewers = []
 
-    thumbnails_boxes = await page.query_selector_all("div.thumbs-box")
-    title_elements = await page.query_selector_all("a.title")
-    nick_elements = await page.query_selector_all("a.nick")
-    view_elements = await page.query_selector_all("span.views")
-    
-    for thumbnail, title, channel_name, live_viewer in zip(thumbnails_boxes, title_elements, nick_elements, view_elements):
-        link_elm = await thumbnail.query_selector("a")
-        if link_elm and await link_elm.get_attribute('href'):
-            links.append(await link_elm.get_attribute('href'))
+    html = await page.content()
+    soup = soup(html, "html.parser")
+    for thumbnail, title, channel_name, live_viewer in zip(
+        soup.find_all("div", class_="thumbs-box"),
+        soup.find_all("a", class_="title"),
+        soup.find_all("a", class_="nick"),
+        soup.find_all("span", class_="views"),
+    ):
+        link_elm = thumbnail.find("a")
+        if link_elm.get('href'):
+            links.append(link_elm['href'])
 
-        img = await thumbnail.query_selector("img")
-        if img and await img.get_attribute('src'):
-            thumbnails.append("https:" + await img.get_attribute('src'))
-        
-        titles.append(await title.text_content())
-        channel_names.append(await channel_name.text_content())
+        img = thumbnail.find("img")
+        if img and 'src' in img.attrs:
+            thumbnails.append("https:" + img['src'])
+        titles.append(title.text)
+        channel_names.append(channel_name.text)
 
-        em = await live_viewer.query_selector("em")
+        em = live_viewer.find("em")
         if em:
-            live_viewers.append(await live_viewer.text_content())
+            live_viewers.append(live_viewer.text)
 
+    print("Afreeca")
     print("Links:", len(links))
     print("Thumbnails:", len(thumbnails))
     print("Titles:", len(titles))

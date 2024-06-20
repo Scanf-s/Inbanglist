@@ -1,10 +1,10 @@
 async def scroll(page):
-    no_of_pagedowns = 10
+    no_of_pagedowns = 30
     while no_of_pagedowns > 0:
         await page.keyboard.press("PageDown")
         no_of_pagedowns -= 1
 
-async def chzzk_crawling(page):
+async def chzzk_crawling(page, soup):
     await page.goto("https://chzzk.naver.com/lives")
     await scroll(page)
 
@@ -13,29 +13,28 @@ async def chzzk_crawling(page):
     titles = []
     channel_names = []
     live_viewers = []
+
+    html = await page.content()
+    soup = soup(html, "html.parser")
+    for thumbnail, title, channel_name, live_viewer in zip(
+        soup.find_all("a", class_="video_card_thumbnail__QXYT8"),
+        soup.find_all("a", class_="video_card_title__Amjk2"),
+        soup.find_all("span", class_="name_text__yQG50"),
+        soup.find_all("span", class_="video_card_badge__w02UD")
+    ):
+        img = thumbnail.find("img")
+        if thumbnail.get('href'):
+            link = "https://chzzk.naver.com" + thumbnail['href']
+            links.append(link)
+        if img and 'src' in img.attrs:
+            thumbnails.append(img['src'])
+        else:
+            thumbnails.append("성인인증걸려있음")
+        titles.append(title.text.strip("라이브 엔드로 이동"))
+        channel_names.append(channel_name.text.strip().strip('\n'))
+        live_viewers.append(live_viewer.text.strip())
     
-    thumbnails_elements = await page.query_selector_all('a.video_card_thumbnail__QXYT8 img')
-    title_elements = await page.query_selector_all('a.video_card_title__Amjk2')
-    channel_name_elements = await page.query_selector_all('span.name_text__yQG50')
-    live_viewer_elements = await page.query_selector_all('span.video_card_badge__w02UD')
-
-    for thumbnail_element, title_element, channel_name_element, live_viewer_element in zip(thumbnails_elements, title_elements, channel_name_elements, live_viewer_elements):
-        thumbnail_src = await thumbnail_element.evaluate('(element) => element.src')
-        thumbnails.append(thumbnail_src if thumbnail_src else '성인인증걸려있음')
-
-        link_href = await thumbnail_element.evaluate('(element) => element.parentElement.href')
-        link = "https://chzzk.naver.com" + link_href if link_href else ''
-        links.append(link)
-
-        title_text = await title_element.text_content()
-        titles.append(title_text.strip("라이브 엔드로 이동"))
-
-        channel_name_text = await channel_name_element.text_content()
-        channel_names.append(channel_name_text.strip())
-
-        live_viewer_text = await live_viewer_element.text_content()
-        live_viewers.append(live_viewer_text.strip())
-
+    print("chzzk")
     print("Links:", len(links))
     print("Thumbnails:", len(thumbnails))
     print("Titles:", len(titles))
