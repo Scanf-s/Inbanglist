@@ -28,6 +28,7 @@ def scroll(driver):
             break
 
         last_height = new_height
+        no_of_pagedowns -= 1
 
 
 def press_show_all(driver):

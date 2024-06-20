@@ -1,5 +1,5 @@
 import time
-from crawling import afreecatv_crawling, youtube_crawling, chzzk_crawling
+from selenium_crawling import afreecatv_crawling, youtube_crawling, chzzk_crawling
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
