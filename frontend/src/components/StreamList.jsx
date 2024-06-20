@@ -1,31 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import StreamItem from './StreamItem';
+import axios from '../api/axios';
 
 const StreamList = ({ platform }) => {
     const [streams, setStreams] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const perPage = 20;
+    const perPage = 10;
     const ref = useRef();
 
     // 더미데이터 fetch -> 추후 api를 통해 불러온 데이터로 변경하여 관리
     useEffect(() => {
         fetchData();
-    }, [platform, currentPage]);
+    }, [platform]);
 
     const fetchData = async () => {
         try {
-            const response = await fetch('/data/data.json');
+            const response = await axios.get(`${platform}`);
 
-            if (!response.ok) {
+            if (response.status < 200 || response.status >= 300) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            const data = await response.json();
-            const filteredData = data
-                .filter((item) => item.kind === platform)
-                .sort((a, b) => b.live_viewer - a.live_viewer);
+            const data = response.data;
+            const sortedData = data.sort((a, b) => b.concurrent_viewers - a.concurrent_viewers);
             const startIndex = (currentPage - 1) * perPage;
-            const selectData = filteredData.slice(startIndex, startIndex + perPage);
+            const selectData = sortedData.slice(startIndex, startIndex + perPage);
             setStreams((prevStreams) => [...prevStreams, ...selectData]);
             // setCurrentPage((prevPage) => prevPage + 1);
         } catch (error) {
@@ -56,7 +54,7 @@ const StreamList = ({ platform }) => {
                 className='flex flex-col gap-6 max-h-[calc(100vh-172px)] overflow-auto scroll-smooth'
                 ref={ref}>
                 {streams.map((stream) => (
-                    <StreamItem key={stream.index} stream={stream} />
+                    <StreamItem key={stream.id} stream={stream} />
                 ))}
             </div>
         </div>
