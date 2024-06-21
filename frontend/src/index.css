@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .scroll_custom {
+    overflow: overlay;
+    scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
+    scrollbar-width: thin;
+  }
+  .scroll_custom:hover {
+    scrollbar-color: rgba(0, 0, 0, 0.6) transparent;
+  }
+}

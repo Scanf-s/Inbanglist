@@ -51,11 +51,12 @@ const StreamList = ({ platform }) => {
         <div className='max-h-[calc(100vh-116px)]'>
             <h1 className='text-2xl p-3'>{platform}</h1>
             <div
-                className='flex flex-col gap-6 max-h-[calc(100vh-172px)] overflow-auto scroll-smooth'
+                className='flex flex-col gap-6 max-h-[calc(100vh-172px)] scroll-smooth scroll_custom'
                 ref={ref}>
                 {streams.map((stream) => (
                     <StreamItem key={stream.id} stream={stream} />
                 ))}
+
             </div>
         </div>
     );
