@@ -51,6 +51,7 @@ CUSTOM_USER_APPS = [
     "youtube.apps.YoutubeConfig",  # YouTube app
     "chzzk.apps.ChzzkConfig",  # Chzzk app
     "users.apps.UsersConfig",  # Users app
+    "core.apps.CoreConfig",  # Core app
 ]
 
 LIBRARIES = [
@@ -195,4 +196,19 @@ SIMPLE_JWT = {
     "ALGORITHM": "HS256",
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+}
+
+# DRF-SPECTACULAR
+SPECTACULAR_SETTINGS = {
+    "TITLE": "API 문서",
+    "DESCRIPTION": "API for AfreecaTV, Chzzk, and Youtube",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "TAGS": [
+        {"name": "User", "description": "User 관련 API"},
+        {"name": "AfreecaTV", "description": "아프리카TV API"},
+        {"name": "Chzzk", "description": "치지직 API"},
+        {"name": "Youtube", "description": "유튜브 라이브 API"},
+    ],
 }

@@ -1,12 +1,8 @@
-from django.urls import include, path
+from django.urls import path
 
-from afreecatv import views
+from afreecatv.views import AfreecaTvListCreateAPI, AfreecaTvRetrieveUpdateDestroyAPI
 
 urlpatterns = [
-    path("", views.AfreecaTvListAPI.as_view({"get": "list"}), name="afreecatv_list"),
-    path(
-        "<int:pk>",
-        views.AfreecaTvListAPI.as_view({"get": "retrieve"}),
-        name="afreecatv_detail",
-    ),
+    path("", AfreecaTvListCreateAPI.as_view(), name="afreecatv_list_create"),
+    path("<int:pk>/", AfreecaTvRetrieveUpdateDestroyAPI.as_view(), name="afreecatv_retrieve_update_destroy"),
 ]
