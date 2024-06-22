@@ -1,8 +1,8 @@
 from django.urls import path
 
-from chzzk import views
+from chzzk.views import ChzzkListCreateAPI, ChzzkRetrieveUpdateDestroyAPI
 
 urlpatterns = [
-    path("", views.ChzzkListAPI.as_view({"get": "list"}), name="chzzk_list"),
-    path("<int:pk>", views.ChzzkListAPI.as_view({"get": "retrieve"}), name="chzzk_detail"),
+    path("", ChzzkListCreateAPI.as_view(), name="chzzk_list_create"),
+    path("<int:pk>/", ChzzkRetrieveUpdateDestroyAPI.as_view(), name="chzzk_retrieve_update_destroy"),
 ]

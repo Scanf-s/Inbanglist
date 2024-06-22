@@ -1,6 +1,6 @@
 from .settings import *
 
-# CI 환경을 위한 별도의 설정 파일
+# Github actions CI 환경을 위한 별도의 설정 파일
 DEBUG = False
 ALLOWED_HOSTS = ["localhost"]
 

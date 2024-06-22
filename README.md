@@ -46,6 +46,7 @@ Docker
 - Python
 - Django
 - React
+- Playwright
 - Selenium
 - AWS EC2
 - AWS RDS

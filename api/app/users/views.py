@@ -1,3 +1,16 @@
+"""
+AfreecaTV, Chzzk, Youtube와 다르게 API를 구현한 이유
+
+AfreecaTv, Chzzk, Youtube는 단순한 CRUD API만 작성해주면 되기 때문에
+https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
+해당 링크에 있는 Concrete View Class를 사용해서 간단하게 구현할 수 있습니다.
+
+하지만 User API의 경우, 아직 해당 내용에 대한 조사가 부족하기도 했고,
+미리 구현된 Concrete View Class를 사용하면 제가 원하는 동작을 만들기가 어렵습니다.
+따라서 그냥 CreateAPIView, GenericAPIView를 사용해서 메소드를 오버라이딩하여 원하는대로 동작하도록 구현했습니다.
+"""
+
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -14,6 +27,7 @@ def get_tokens_for_user(user: User):
     }
 
 
+@extend_schema(tags=["User"])
 class UserRegisterAPI(generics.CreateAPIView):
     """
     사용자 회원가입 관련 API
@@ -37,6 +51,7 @@ class UserRegisterAPI(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["User"])
 class UserLoginAPI(generics.GenericAPIView):
     """
     사용자 로그인 관련 API
@@ -67,6 +82,7 @@ class UserLoginAPI(generics.GenericAPIView):
         )
 
 
+@extend_schema(tags=["User"])
 class UserLogoutAPI(generics.GenericAPIView):
     """
     사용자 로그아웃 API
@@ -87,7 +103,12 @@ class UserLogoutAPI(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(tags=["User"])
 class UserDeleteAPI(generics.GenericAPIView):
+    """
+    사용자 회원 탈퇴 API
+    """
+
     serializer_class = UserDeleteSerializer
 
     def delete(self, request, *args, **kwargs):
