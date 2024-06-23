@@ -15,7 +15,7 @@ const StreamList = ({ platform }) => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${platform}`);
+            const response = await axios.get(`/api/v1/${platform}`);
 
             if (response.status < 200 || response.status >= 300) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,7 +56,6 @@ const StreamList = ({ platform }) => {
                 {streams.map((stream) => (
                     <StreamItem key={stream.id} stream={stream} />
                 ))}
-
             </div>
         </div>
     );
