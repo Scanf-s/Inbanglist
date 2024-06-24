@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../store/authStore';
 
 const liStyle = 'flex flex-col gap-1 items-center';
 const inputStyle = 'h-12 p-2 w-full border border-solid border-slate-300 rounded-md text-sm';
@@ -9,12 +10,36 @@ const SignUpPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    
+    // 회원가입 클릭 버튼 이벤트 함수
+    const register = useAuthStore(state => state.register);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        // 비밀번호 일치 여부 확인
+        if (password !== confirmPassword) {
+            setError('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        try {
+            // 회원가입 요청
+            await register(name, email, password);
+            // 회원가입 성공 시 로그인 페이지로 이동
+            navigate('/login');
+        } catch (error) {
+            console.error('회원가입 실패:', error);
+            setError('회원가입에 실패했습니다. 다시 시도해주세요.');
+        }
+    };
 
     return (
         <div className='h-screen w-screen bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2]'>
             <div className='fixed h-full w-full'>
                 <div className='flex h-full justify-center items-center'>
-                    <form className='w-[calc(100%-40px)] max-w-[440px] p-[50px] bg-white border rounded-xl shadow-md'>
+                    <form className='w-[calc(100%-40px)] max-w-[440px] p-[50px] bg-white border rounded-xl shadow-md' onSubmit={handleSubmit}>
                         <ul className='flex flex-col gap-4'>
                             <li className={liStyle}>
                                 <input
