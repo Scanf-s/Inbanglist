@@ -1,14 +1,11 @@
 import NavBar from './NavBar';
 import { Outlet } from 'react-router-dom';
 
-const Layout = ({ darkMode, toggleDarkMode }) => {
+const Layout = () => {
     return (
-        <div className={`w-full max-h-screen min-w-screen ${darkMode ? 'dark' : ''} `}>
-            <NavBar toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-            <div
-                className={`w-screen max-h-[calc(100vh-68px)] ${
-                    darkMode ? 'bg-slate-700' : 'bg-white'
-                }`}>
+        <div className='min-w-screen min-h-screen'>
+            <NavBar />
+            <div className='w-full max-h-[calc(100vh-68px)] dark:bg-slate-700 bg-white'>
                 <Outlet />
             </div>
         </div>
