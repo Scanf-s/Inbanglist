@@ -123,10 +123,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://inbanglist.com",
     "http://www.inbanglist.com",
     "http://localhost:8000",
+    "http://localhost:5173",
 ]
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://\w+\.inbanglist\.com$",
+    r"^http://\w+\.inbanglist\.com$",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = False
