@@ -15,7 +15,7 @@ const StreamList = ({ platform }) => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`/api/v1/${platform}`);
+            const response = await axios.get(`/api/v1/${platform}/`);
 
             if (response.status < 200 || response.status >= 300) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -48,10 +48,10 @@ const StreamList = ({ platform }) => {
     }, []);
 
     return (
-        <div className='max-h-[calc(100vh-116px)]'>
-            <h1 className='text-2xl p-3'>{platform}</h1>
+        <div className='max-h-[calc(100vh-100px)]'>
+            <h1 className='text-2xl p-3 text-black dark:text-white'>{platform}</h1>
             <div
-                className='flex flex-col gap-6 max-h-[calc(100vh-172px)] scroll-smooth scroll_custom'
+                className='flex flex-col gap-6 max-h-[calc(100vh-156px)] scroll-smooth scroll_custom'
                 ref={ref}>
                 {streams.map((stream) => (
                     <StreamItem key={stream.id} stream={stream} />

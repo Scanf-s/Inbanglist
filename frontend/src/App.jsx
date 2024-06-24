@@ -2,24 +2,22 @@ import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/common/Layout';
 import HomePage from './pages/HomePage';
-import { useState } from 'react';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import { useDarkModeStore } from './store/darkMode';
+import { useEffect } from 'react';
 
 function App() {
-    const [darkMode, setDarkMode] = useState(false);
+    const { initializeDarkMode } = useDarkModeStore();
 
-    const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
-        console.log(darkMode);
-    };
+    useEffect(() => {
+        initializeDarkMode();
+    }, [initializeDarkMode]);
 
     return (
         <Routes>
-            <Route
-                path='/'
-                element={<Layout toggleDarkMode={toggleDarkMode} darkMode={darkMode} />}>
-                <Route index element={<HomePage darkMode={darkMode} />} />
+            <Route path='/' element={<Layout />}>
+                <Route index element={<HomePage />} />
             </Route>
             <Route path='login' element={<LoginPage />} />
             <Route path='signUp' element={<SignUpPage />} />
