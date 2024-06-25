@@ -18,3 +18,29 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py migrate &&
              gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers 4 --timeout 120 --log-level debug"
+    networks:
+      - app-network
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  celery:
+    build:
+      context: ./api
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - ./api/app:/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

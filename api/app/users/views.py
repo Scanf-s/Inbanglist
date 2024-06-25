@@ -5,7 +5,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
 from .serializers import UserDeleteSerializer, UserLoginSerializer, UserLogoutSerializer, UserRegisterSerializer, EmptySerializer
-from .utils import confirm_email_token
+from .utils import confirm_email_token, generate_email_token
+from .tasks import send_activation_email_task
 
 
 def get_tokens_for_user(user: User):
@@ -30,7 +31,15 @@ class UserRegisterAPI(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            # 비동기로 이메일 전송 작업을 큐에 추가
+            # Celery를 사용하여 이메일 전송 작업을 백그라운드에서 비동기적으로 처리
+            token = generate_email_token(user.email) # 사용자 정보가 저장된 후, 이메일 인증 토큰을 생성
+            send_activation_email_task.delay(user.email, token) # 이메일 전송 작업을 비동기로 큐에 추가
+            # delay 메서드는 Celery에서 작업을 비동기로 실행하도록 예약하는 메서드 (email send 작업을 비동기로 큐에 추가하고 즉시 반환)
+
             tokens = get_tokens_for_user(user)
+
+            # 비동기 작업을 큐에 추가한 후, API는 사용자 생성 성공 메시지와 함께 사용자 데이터 및 토큰을 클라이언트에 반환
             return Response(
                 {
                     "message": "User created successfully",
