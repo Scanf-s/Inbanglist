@@ -1,12 +1,8 @@
 from django.urls import path
 
-from youtube import views
+from youtube.views import YoutubeListCreateAPI, YoutubeRetrieveUpdateDestroyAPI
 
 urlpatterns = [
-    path("", views.YoutubeListAPI.as_view({"get": "list"}), name="youtube_list"),
-    path(
-        "<int:pk>",
-        views.YoutubeListAPI.as_view({"get": "retrieve"}),
-        name="youtube_detail",
-    ),
+    path("", YoutubeListCreateAPI.as_view(), name="youtube_list_create"),
+    path("<int:pk>/", YoutubeRetrieveUpdateDestroyAPI.as_view(), name="youtube_retrieve_update_destroy"),
 ]

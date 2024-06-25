@@ -51,6 +51,7 @@ CUSTOM_USER_APPS = [
     "youtube.apps.YoutubeConfig",  # YouTube app
     "chzzk.apps.ChzzkConfig",  # Chzzk app
     "users.apps.UsersConfig",  # Users app
+    "core.apps.CoreConfig",  # Core app
 ]
 
 LIBRARIES = [
@@ -94,12 +95,42 @@ django-cors-headers 패키지는 Django 애플리케이션에서 CORS 설정을 
 이 패키지를 사용하여 특정 출처에서 오는 요청을 허용하거나 거부할 수 있습니다.
 """
 # CORS 설정 (필요에 따라 도메인 추가)
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  # 개발 환경에서 React 또는 다른 프론트엔드 앱이 실행되는 주소
-# ]
+# 사용할 HTTP Method 옵션
+CORS_ALLOW_METHODS = [
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
 
-# 나중에 위에있는거 주석지우고 사용
-CORS_ALLOW_ALL_ORIGINS = True
+# 허용할 HTTP Header
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://inbanglist.com",
+    "http://www.inbanglist.com",
+    "http://localhost:8000",
+    "http://localhost:5173",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^http://\w+\.inbanglist\.com$",
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
 
 # 프로젝트의 루트 URL 설정 파일
 ROOT_URLCONF = "config.urls"
@@ -195,4 +226,19 @@ SIMPLE_JWT = {
     "ALGORITHM": "HS256",
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+}
+
+# DRF-SPECTACULAR
+SPECTACULAR_SETTINGS = {
+    "TITLE": "API 문서",
+    "DESCRIPTION": "API for AfreecaTV, Chzzk, and Youtube",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "TAGS": [
+        {"name": "User", "description": "User 관련 API"},
+        {"name": "AfreecaTV", "description": "아프리카TV API"},
+        {"name": "Chzzk", "description": "치지직 API"},
+        {"name": "Youtube", "description": "유튜브 라이브 API"},
+    ],
 }

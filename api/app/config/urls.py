@@ -3,7 +3,10 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from common.views import RootView
+
 urlpatterns = [
+    path("", RootView.as_view(), name="api_root"),
     path("admin/", admin.site.urls),
     path("api/v1/afreecatv/", include("afreecatv.urls")),
     path("api/v1/chzzk/", include("chzzk.urls")),

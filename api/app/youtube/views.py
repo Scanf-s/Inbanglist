@@ -1,37 +1,20 @@
-from typing import Optional
-
-from django.db.models import QuerySet
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from rest_framework import status, viewsets
-from rest_framework.response import Response
+from rest_framework import generics
 
 from common.models import CommonModel
-from common.serializers import LiveStreamingModelSerializer
+from youtube.serializers import YoutubeDataSerializer
+
+# 참고 링크
+# https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
 
 
-class YoutubeListAPI(viewsets.ViewSet):
-    """
-    기본적인 Youtube 스트리밍 리스트 API
-    """
+@extend_schema(tags=["Youtube"])
+class YoutubeListCreateAPI(generics.ListCreateAPIView):
+    queryset = CommonModel.objects.filter(platform="youtube")
+    serializer_class = YoutubeDataSerializer
 
-    queryset: QuerySet = CommonModel.objects.filter(platform="youtube")
 
-    @extend_schema(
-        responses={200: LiveStreamingModelSerializer(many=True)},
-    )
-    def list(self, request) -> Response:
-        serializer: LiveStreamingModelSerializer = LiveStreamingModelSerializer(
-            self.queryset,
-            many=True,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @extend_schema(
-        responses={200: LiveStreamingModelSerializer},
-    )
-    def retrieve(self, request, pk: Optional[int] = None) -> Response:
-        instance: CommonModel = get_object_or_404(self.queryset, id=pk)
-        serializer: LiveStreamingModelSerializer = LiveStreamingModelSerializer(instance=instance)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+@extend_schema(tags=["Youtube"])
+class YoutubeRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CommonModel.objects.filter(platform="youtube")
+    serializer_class = YoutubeDataSerializer
