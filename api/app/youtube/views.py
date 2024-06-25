@@ -18,3 +18,4 @@ class YoutubeListCreateAPI(generics.ListCreateAPIView):
 class YoutubeRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = CommonModel.objects.filter(platform="youtube")
     serializer_class = YoutubeDataSerializer
+

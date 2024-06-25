@@ -99,9 +99,9 @@ django-cors-headers 패키지는 Django 애플리케이션에서 CORS 설정을 
 CORS_ALLOW_METHODS = [
     "GET",
     "OPTIONS",
-    "PATCH",
     "POST",
     "PUT",
+    "DELETE",
 ]
 
 # 허용할 HTTP Header
@@ -125,12 +125,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://localhost:5173",
 ]
-
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://\w+\.inbanglist\.com$",
-]
-
-CORS_ALLOW_ALL_ORIGINS = False
 
 # 프로젝트의 루트 URL 설정 파일
 ROOT_URLCONF = "config.urls"
@@ -220,8 +214,8 @@ AUTH_USER_MODEL = "users.User"
 # Simple JWT Token Configurations
 # SIMPLE JWT
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "SIGNING_KEY": "SECRET",
     "ALGORITHM": "HS256",
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -242,3 +236,12 @@ SPECTACULAR_SETTINGS = {
         {"name": "Youtube", "description": "유튜브 라이브 API"},
     ],
 }
+
+# Email Verification
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
