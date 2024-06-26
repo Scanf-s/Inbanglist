@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
+
 from .models import User
 from .serializers import (
     EmptySerializer,
@@ -21,6 +22,7 @@ from typing import Dict
 
 def get_tokens_for_user(user: User) -> Dict[str, str]:
     refresh: RefreshToken = cast(RefreshToken, RefreshToken.for_user(user))
+
     return {
         "access": str(refresh.access_token),
         "refresh": str(refresh),
