@@ -71,6 +71,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",  # 기본 인증 클래스 설정.
     ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10, # 페이지당 보여줄 갯수 : 10
 }
 
 # 요청과 응답을 처리하는 미들웨어 목록
