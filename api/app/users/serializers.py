@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from .models import User
 from .utils import generate_email_token, send_activation_email
@@ -12,9 +12,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     password_verify = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        if User.objects.filter(email=attrs['email']).exists(): # if there is a user with the same email in the database
+        if User.objects.filter(email=attrs["email"]).exists():  # if there is a user with the same email in the database
             raise serializers.ValidationError("Email already exists")
-        if attrs["password"] != attrs["password_verify"]: # if user inputs different passwords
+        if attrs["password"] != attrs["password_verify"]:  # if user inputs different passwords
             raise serializers.ValidationError("Password does not match")
         return attrs
 
@@ -23,7 +23,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             email=validated_data["email"],
             password=validated_data["password"],
-            is_active=False, # 이메일 인증을 하기 이전이므로 False로 설정
+            is_active=False,  # 이메일 인증을 하기 이전이므로 False로 설정
         )
         token = generate_email_token(user.email)
         send_activation_email(user.email, token)
@@ -39,8 +39,8 @@ class UserLoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
+        email = attrs.get("email")
+        password = attrs.get("password")
 
         # 이메일 조회
         try:
@@ -56,18 +56,18 @@ class UserLoginSerializer(serializers.ModelSerializer):
         if not user.is_active:
             raise serializers.ValidationError("User is not active. Please check your email")
 
-        return {'user': user}
+        return {"user": user}
 
     class Meta:
         model = User
         fields = ["email", "password"]
 
 
-
 class UserLogoutSerializer(serializers.Serializer):
     """
     if client requests logout, client must send their access token and refresh token
     """
+
     refresh_token = serializers.CharField()
 
     def validate(self, attrs):
@@ -124,4 +124,5 @@ class EmptySerializer(serializers.Serializer):
     """
     Use empty serializer to resolve errors in user email verification api
     """
+
     pass

@@ -2,8 +2,8 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 
 from common.models import CommonModel
-from youtube.serializers import YoutubeDataSerializer
 from youtube.pagination import YoutubePagination
+from youtube.serializers import YoutubeDataSerializer
 
 # 참고 링크
 # https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes

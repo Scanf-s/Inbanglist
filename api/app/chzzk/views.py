@@ -1,9 +1,9 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 
+from chzzk.pagination import ChzzkPagination
 from chzzk.serializers import ChzzkDataSerializer
 from common.models import CommonModel
-from chzzk.pagination import ChzzkPagination
 
 
 # 참고 링크

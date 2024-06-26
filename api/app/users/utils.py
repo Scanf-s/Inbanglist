@@ -1,14 +1,16 @@
-from itsdangerous import URLSafeSerializer
 from django.conf import settings
-from django.urls import reverse
 from django.core.mail import send_mail
+from django.urls import reverse
+from itsdangerous import URLSafeSerializer
+
 
 def generate_email_token(user_email: str) -> str:
     """
     Generates an email verification token for the given user.
     """
-    serializer = URLSafeSerializer(settings.SECRET_KEY) # USE Django settings SECRET_KEY
+    serializer = URLSafeSerializer(settings.SECRET_KEY)  # USE Django settings SECRET_KEY
     return serializer.dumps(user_email, salt=settings.SECRET_KEY)
+
 
 def confirm_email_token(token, expiration=3600) -> str | bool:
     """
@@ -21,8 +23,9 @@ def confirm_email_token(token, expiration=3600) -> str | bool:
         return False
     return email
 
+
 def send_activation_email(user_email: str, token) -> None:
-    activation_link = "http://127.0.0.1:8000" + reverse('user_email_activate', args=[token])
+    activation_link = "http://127.0.0.1:8000" + reverse("user_email_activate", args=[token])
     subject: str = "Activate your account"
     body: str = f"""
     Hello,

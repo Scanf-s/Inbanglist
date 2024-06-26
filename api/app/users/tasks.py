@@ -1,7 +1,8 @@
 # 이메일 전송을 처리하는 Celery 작업을 정의
 from celery import shared_task
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
+
 
 @shared_task
 def send_activation_email_task(user_email: str, token: str) -> None:
