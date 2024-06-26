@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 
+from afreecatv.pagination import AfreecaTVPagination
 from afreecatv.serializers import AfreecaTvDataSerializer
 from common.models import CommonModel
 
@@ -10,8 +11,9 @@ from common.models import CommonModel
 
 @extend_schema(tags=["AfreecaTV"])
 class AfreecaTvListCreateAPI(generics.ListCreateAPIView):
-    queryset = CommonModel.objects.filter(platform="afreecatv")
+    queryset = CommonModel.objects.filter(platform="afreecatv").order_by("-concurrent_viewers")
     serializer_class = AfreecaTvDataSerializer
+    pagination_class = AfreecaTVPagination
 
 
 @extend_schema(tags=["AfreecaTV"])

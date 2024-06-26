@@ -1,29 +1,32 @@
-"""
-AfreecaTV, Chzzk, Youtube와 다르게 API를 구현한 이유
-
-AfreecaTv, Chzzk, Youtube는 단순한 CRUD API만 작성해주면 되기 때문에
-https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
-해당 링크에 있는 Concrete View Class를 사용해서 간단하게 구현할 수 있습니다.
-
-하지만 User API의 경우, 아직 해당 내용에 대한 조사가 부족하기도 했고,
-미리 구현된 Concrete View Class를 사용하면 제가 원하는 동작을 만들기가 어렵습니다.
-따라서 그냥 CreateAPIView, GenericAPIView를 사용해서 메소드를 오버라이딩하여 원하는대로 동작하도록 구현했습니다.
-"""
+from typing import cast
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken, Token, TokenError
 
 from .models import User
-from .serializers import UserDeleteSerializer, UserLoginSerializer, UserLogoutSerializer, UserRegisterSerializer
+from .serializers import (
+    EmptySerializer,
+    UserDeleteSerializer,
+    UserLoginSerializer,
+    UserLogoutSerializer,
+    UserRegisterSerializer,
+)
+from .tasks import send_activation_email_task
+from .utils import confirm_email_token, generate_email_token
+
+# import logging
+#
+# logger = logging.getLogger(__name__)
+#
 
 
 def get_tokens_for_user(user: User):
-    refresh: RefreshToken = RefreshToken.for_user(user)
+    refresh = cast(RefreshToken, RefreshToken.for_user(user))
     return {
-        "refresh": str(refresh),
         "access": str(refresh.access_token),
+        "refresh": str(refresh),
     }
 
 
@@ -31,6 +34,8 @@ def get_tokens_for_user(user: User):
 class UserRegisterAPI(generics.CreateAPIView):
     """
     사용자 회원가입 관련 API
+    최초 만든 사용자는 is_active = False로 해두고,
+    나중에 메일 인증을 받은 사용자만 is_active = True로 만든다.
     """
 
     serializer_class = UserRegisterSerializer
@@ -39,12 +44,17 @@ class UserRegisterAPI(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            tokens = get_tokens_for_user(user)
+            # 비동기로 이메일 전송 작업을 큐에 추가
+            # Celery를 사용하여 이메일 전송 작업을 백그라운드에서 비동기적으로 처리
+            token = generate_email_token(user.email)  # 사용자 정보가 저장된 후, 이메일 인증 토큰을 생성
+            send_activation_email_task.delay(user.email, token)  # 이메일 전송 작업을 비동기로 큐에 추가
+            # delay 메서드는 Celery에서 작업을 비동기로 실행하도록 예약하는 메서드 (email send 작업을 비동기로 큐에 추가하고 즉시 반환)
+
+            # 비동기 작업을 큐에 추가한 후, API는 사용자 생성 성공 메시지와 함께 사용자 데이터 및 토큰을 클라이언트에 반환
             return Response(
                 {
-                    "message": "User created successfully",
+                    "message": "User created successfully and activation email sent",
                     "user": UserRegisterSerializer(user).data,
-                    "tokens": tokens,
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -53,26 +63,21 @@ class UserRegisterAPI(generics.CreateAPIView):
 
 @extend_schema(tags=["User"])
 class UserLoginAPI(generics.GenericAPIView):
-    """
-    사용자 로그인 관련 API
-    """
-
     serializer_class = UserLoginSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = User.objects.filter(email=serializer.validated_data["email"]).first()
-            if user and user.check_password(serializer.validated_data["password"]):
-                tokens = get_tokens_for_user(user)
-                return Response(
-                    {
-                        "message": "Login successful",
-                        "user": UserLoginSerializer(user).data,
-                        "tokens": tokens,
-                    },
-                    status=status.HTTP_200_OK,
-                )
+        if serializer.is_valid():  # validate email and password in serializer
+            user = serializer.validated_data["user"]
+            tokens = get_tokens_for_user(user)
+            return Response(
+                {
+                    "message": "Login successful",
+                    "user": UserLoginSerializer(user).data,
+                    "jwt_tokens": tokens,
+                },
+                status=status.HTTP_200_OK,
+            )
         return Response(
             {
                 "message": "Login failed",
@@ -84,22 +89,24 @@ class UserLoginAPI(generics.GenericAPIView):
 
 @extend_schema(tags=["User"])
 class UserLogoutAPI(generics.GenericAPIView):
-    """
-    사용자 로그아웃 API
-    """
-
     serializer_class = UserLogoutSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
-                token = RefreshToken(serializer.validated_data["refresh"])
-                token.blacklist()
-                return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
-            except TokenError:
-                return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+                refresh_token_str = serializer.validated_data["refresh_token"]
 
+                # RefreshToken을 블랙리스트에 추가
+                try:
+                    refresh_token = RefreshToken(refresh_token_str)
+                    refresh_token.blacklist()
+                except TokenError as e:
+                    return Response({"message": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
+
+                return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+            except TokenError as e:
+                return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -115,10 +122,12 @@ class UserDeleteAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
-                token = RefreshToken(serializer.validated_data["refresh"])
-                token.blacklist()
+                refresh_token = RefreshToken(serializer.validated_data["refresh_token"])
+                refresh_token.blacklist()
+
                 user = User.objects.get(email=serializer.validated_data["email"])
                 user.delete()
+
                 return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
                 return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -126,3 +135,32 @@ class UserDeleteAPI(generics.GenericAPIView):
                 return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(tags=["User"])
+class UserEmailActivationAPI(generics.GenericAPIView):
+
+    serializer_class = EmptySerializer
+
+    def get(self, request, token, *args, **kwargs) -> Response:
+        email = confirm_email_token(token)
+        if email:
+            try:
+                user = User.objects.filter(email=email).first()
+                if user is None:
+                    return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+                user.is_active = True
+                user.save()  # user's is_active status has changed False to True, save changes into the database
+                jwt_token = get_tokens_for_user(user)
+
+                return Response(
+                    {
+                        "message": "User created successfully.",
+                        "email": user.email,
+                        "jwt_tokens": jwt_token,
+                    },
+                    status=status.HTTP_201_CREATED,
+                )
+            except:
+                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": "Invalid or Expired activation code"}, status=status.HTTP_400_BAD_REQUEST)
