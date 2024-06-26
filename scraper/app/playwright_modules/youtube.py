@@ -1,4 +1,6 @@
 from re import search
+from datetime import datetime
+from convert_int import convert_to_int
 
 async def press_show_all(page):
     contents = await page.query_selector("#contents")
@@ -7,7 +9,7 @@ async def press_show_all(page):
     await menu_container.click()
 
 async def scroll(page):
-    no_of_pagedowns = 999
+    no_of_pagedowns = 22
     last_height = await page.evaluate("document.documentElement.scrollHeight")
     
     last_chk_cnt = 0
@@ -21,10 +23,6 @@ async def scroll(page):
         else:
             last_chk_cnt = 0
 
-        if last_chk_cnt > 5:
-            break
-
-        last_height = new_height
         no_of_pagedowns -= 1
 
 async def youtube_crawling(page, soup):
@@ -43,25 +41,35 @@ async def youtube_crawling(page, soup):
                          channel_name in text_container.find_all('a')]
     live_viewers_list = [viewers.text for viewers in
                          soup.find_all("span", class_="inline-metadata-item style-scope ytd-video-meta-block")]
+    channel_links = [link.get('href') for link in soup.find_all("a", id="avatar-link") if link.get('href')]
 
     print("Links:", len(link_list))
     print("Thumbnails:", len(thumbnail_list))
     print("Titles:", len(title_list))
     print("Channel Names:", len(channel_name_list))
     print("Live Viewers:", len(live_viewers_list))
+    print("channel_link:", len(channel_links))
 
-    datas = [(thumb, link, title, channel, viewers) for thumb, link, title, channel, viewers in
-                     zip(thumbnail_list, link_list, title_list, channel_name_list, live_viewers_list) if
-                     not search(r'Streamed \d+', viewers)]
-
-    live_data_list = [
-        {
-            'thumbnail': data[0],
-            'link': data[1],
-            'title': data[2],
-            'channel_name': data[3],
-            'viewers': data[4],
-        } for data in datas
-    ]
+    datas = [(thumb, link, channel_link, title, channel, viewers) for thumb, link, channel_link, title, channel, viewers in
+                     zip(thumbnail_list, link_list, channel_links, title_list, channel_name_list, live_viewers_list) if
+                     not search(r'Streamed \d+|조회수|스트리밍|분', viewers)]
+    
+    print(len(datas))
+    
+    live_data_list = []
+    for thumbnail, streaming_link, channel_link, title, channel_name, concurrent_viewers in datas:
+        live_data_list.append({
+            'channel_name': channel_name,
+            'thumbnail': thumbnail,
+            'concurrent_viewers': convert_to_int(concurrent_viewers),
+            'title': title,
+            'platform': "youtube",
+            'streaming_link': "https://www.youtube.com" + streaming_link,
+            'channel_link': "https://www.youtube.com" + channel_link,
+            'channel_description': "",
+            'followers': 0,
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        })
 
     return live_data_list

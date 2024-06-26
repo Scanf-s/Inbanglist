@@ -11,7 +11,7 @@ from db import connector
 
 async def main():
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=False, slow_mo=500)
+        browser = await playwright.chromium.launch(headless=True, slow_mo=500)
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
         )
@@ -22,13 +22,9 @@ async def main():
         tasks.append(asyncio.create_task(chzzk_crawling(await context.new_page(), BeautifulSoup)))
 
         results = await asyncio.gather(*tasks)
-        await browser.close()
-
-        results[0].insert(0, 'afreecatv')
-        results[1].insert(0, 'youtube')
-        results[2].insert(0, 'chzzk')
-
+        results = [item for result_array in results for item in result_array]
         connector.insert(results)
+        await browser.close()
 
 
 if __name__ == "__main__":
