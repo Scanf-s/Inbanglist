@@ -3,7 +3,7 @@ from typing import Dict, cast
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken, Token, TokenError
 
 from .models import User
 from .serializers import (
