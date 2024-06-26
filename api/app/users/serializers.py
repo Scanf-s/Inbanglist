@@ -1,9 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .utils import generate_email_token, send_activation_email
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -12,7 +11,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     password_verify = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        if User.objects.filter(email=attrs["email"]).exists():  # if there is a user with the same email in the database
+        email = attrs.get("email")
+        if User.objects.filter(email=email).exists():  # if there is a user with the same email in the database
             raise serializers.ValidationError("Email already exists")
         if attrs["password"] != attrs["password_verify"]:  # if user inputs different passwords
             raise serializers.ValidationError("Password does not match")
@@ -25,8 +25,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=validated_data["password"],
             is_active=False,  # 이메일 인증을 하기 이전이므로 False로 설정
         )
-        token = generate_email_token(user.email)
-        send_activation_email(user.email, token)
         return user
 
     class Meta:
