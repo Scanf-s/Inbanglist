@@ -5,7 +5,7 @@ from django.conf import settings
 
 @shared_task
 def send_activation_email_task(user_email: str, token: str) -> None:
-    activation_link = f"http://127.0.0.1:8000/activate/{token}/"
+    activation_link = f"http://127.0.0.1:8000/api/v1/users/activate/{token}/"
     subject = "Activate your account"
     body = f"""
     Hello,

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 
 from .models import User
 from .utils import generate_email_token, send_activation_email
@@ -35,15 +35,40 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        # 이메일 조회
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Email not found")
+
+        # 비밀번호 검사
+        if not user.check_password(password):
+            raise serializers.ValidationError("Password does not match")
+
+        # 사용자 활성 상태 확인
+        if not user.is_active:
+            raise serializers.ValidationError("User is not active. Please check your email")
+
+        return {'user': user}
 
     class Meta:
         model = User
         fields = ["email", "password"]
 
 
+
 class UserLogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField() # if client requests logout, client must send their refresh token
+    """
+    if client requests logout, client must send their access token and refresh token
+    """
+    refresh_token = serializers.CharField()
 
     def validate(self, attrs):
         """
@@ -51,38 +76,38 @@ class UserLogoutSerializer(serializers.Serializer):
         When UserLoginAPIView's logout function passes the token to the serializer,
         the token can be retrieved from attrs['refresh']
         """
-        token = attrs["refresh"]
-        if not token:
-            raise serializers.ValidationError("Token not found")
+        refresh_token = attrs["refresh_token"]
+        if not refresh_token:
+            raise serializers.ValidationError("Refresh token are not found")
 
         try:
-            # Verify that the token is not expired
-            RefreshToken(token)
+            # 토큰이 만료되지 않았는지 확인
+            RefreshToken(refresh_token)
         except TokenError:
             raise serializers.ValidationError("Invalid token or Expired")
         return attrs
 
     class Meta:
-        fields = ["refresh"]
+        fields = ["refresh_token"]
 
 
 class UserDeleteSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    refresh = serializers.CharField()
+    refresh_token = serializers.CharField()
 
     def validate(self, attrs):
         email = attrs["email"]
         password = attrs["password"]
-        token = attrs["refresh"]
+        refresh_token = attrs["refresh_token"]
 
-        if not token or not email or not password:
+        if not refresh_token or not email or not password:
             raise serializers.ValidationError("All fields are required")
         try:
             user = User.objects.get(email=email)
             if not user.check_password(password):
                 raise serializers.ValidationError("Password does not match")
-            RefreshToken(token)
+            RefreshToken(refresh_token)
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found")
         except TokenError:
@@ -92,7 +117,7 @@ class UserDeleteSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ["email", "password", "refresh"]
+        fields = ["email", "password", "access_token", "refresh_token"]
 
 
 class EmptySerializer(serializers.Serializer):
