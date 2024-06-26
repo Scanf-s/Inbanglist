@@ -1,6 +1,7 @@
+from typing import Union
+
 from django.conf import settings
 from itsdangerous import URLSafeSerializer
-from typing import Union
 
 
 def generate_email_token(user_email: str) -> str:

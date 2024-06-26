@@ -1,8 +1,8 @@
-from typing import cast
+from typing import Dict, cast
 
-from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
@@ -15,8 +15,6 @@ from .serializers import (
 )
 from .tasks import send_activation_email_task
 from .utils import confirm_email_token, generate_email_token
-
-from typing import Dict
 
 
 def get_tokens_for_user(user: User) -> Dict[str, str]:
