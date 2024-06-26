@@ -29,3 +29,15 @@ class CommonModel(models.Model):
 
     def __str__(self):
         return f"{self.platform} 에서 방송중인 {self.channel_name}님의 방송제목 {self.title}"
+
+
+class LiveStreamingCategories(models.Model):
+    categories: CharField = models.CharField(max_length=255, null=False)  # 방송 중요
+
+    class Meta:
+        db_table = "live_streaming_genre_table"
+        verbose_name = "라이브 스트리밍 중요"
+        verbose_name_plural = "라이브 스트리밍 중요 목록"
+
+    def __str__(self):
+        return f"{self.platform} 에서 방송중인 {self.channel_name}님의 방송 중요 {self.genre}"

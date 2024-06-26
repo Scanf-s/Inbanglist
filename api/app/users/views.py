@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Dict, cast
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
@@ -16,14 +16,9 @@ from .serializers import (
 from .tasks import send_activation_email_task
 from .utils import confirm_email_token, generate_email_token
 
-# import logging
-#
-# logger = logging.getLogger(__name__)
-#
 
-
-def get_tokens_for_user(user: User):
-    refresh = cast(RefreshToken, RefreshToken.for_user(user))
+def get_tokens_for_user(user: User) -> Dict[str, str]:
+    refresh: RefreshToken = cast(RefreshToken, RefreshToken.for_user(user))
     return {
         "access": str(refresh.access_token),
         "refresh": str(refresh),
@@ -40,7 +35,7 @@ class UserRegisterAPI(generics.CreateAPIView):
 
     serializer_class = UserRegisterSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -49,7 +44,6 @@ class UserRegisterAPI(generics.CreateAPIView):
             token = generate_email_token(user.email)  # 사용자 정보가 저장된 후, 이메일 인증 토큰을 생성
             send_activation_email_task.delay(user.email, token)  # 이메일 전송 작업을 비동기로 큐에 추가
             # delay 메서드는 Celery에서 작업을 비동기로 실행하도록 예약하는 메서드 (email send 작업을 비동기로 큐에 추가하고 즉시 반환)
-
             # 비동기 작업을 큐에 추가한 후, API는 사용자 생성 성공 메시지와 함께 사용자 데이터 및 토큰을 클라이언트에 반환
             return Response(
                 {
@@ -65,7 +59,7 @@ class UserRegisterAPI(generics.CreateAPIView):
 class UserLoginAPI(generics.GenericAPIView):
     serializer_class = UserLoginSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():  # validate email and password in serializer
             user = serializer.validated_data["user"]
@@ -91,7 +85,7 @@ class UserLoginAPI(generics.GenericAPIView):
 class UserLogoutAPI(generics.GenericAPIView):
     serializer_class = UserLogoutSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -118,7 +112,7 @@ class UserDeleteAPI(generics.GenericAPIView):
 
     serializer_class = UserDeleteSerializer
 
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
