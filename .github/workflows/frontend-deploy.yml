@@ -21,12 +21,12 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
-            - run: npm i
+            - run: npm install
               working-directory: ./frontend
             - run: npm run build --if-present
               working-directory: ./frontend
 
-            - uses: aws-actions/s3-sync-action@v0.5.0
+            - uses: awact/s3-action@master
               with:
                   args: --acl public-read --follow-symlinks --delete
               env:
