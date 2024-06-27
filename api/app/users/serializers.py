@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from .models import User
+from .utils import generate_email_token, send_activation_email
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
