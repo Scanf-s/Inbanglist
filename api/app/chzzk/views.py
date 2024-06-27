@@ -1,6 +1,6 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 
 from chzzk.pagination import ChzzkPagination
 from chzzk.serializers import ChzzkDataSerializer
@@ -14,6 +14,7 @@ class ChzzkListAPI(generics.ListAPIView):
     queryset = CommonModel.objects.filter(platform="chzzk").order_by("-concurrent_viewers")
     serializer_class = ChzzkDataSerializer
     pagination_class = ChzzkPagination
+    permission_classes = [AllowAny]
 
 
 @extend_schema(tags=["Chzzk"])

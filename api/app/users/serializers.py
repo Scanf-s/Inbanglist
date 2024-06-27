@@ -90,32 +90,67 @@ class UserLogoutSerializer(serializers.Serializer):
 
 
 class UserDeleteSerializer(serializers.Serializer):
+    """
+    Normal Account User Delete Serializer
+    """
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False)
     refresh_token = serializers.CharField()
 
     def validate(self, attrs):
-        email = attrs["email"]
-        password = attrs["password"]
-        refresh_token = attrs["refresh_token"]
+        email = attrs.get("email")
+        password = attrs.get("password")
+        refresh_token = attrs.get("refresh_token")
 
-        if not refresh_token or not email or not password:
-            raise serializers.ValidationError("All fields are required")
+        if not email or not refresh_token:
+            raise serializers.ValidationError("Email and refresh token are required")
+
         try:
-            user = User.objects.get(email=email)
-            if not user.check_password(password):
-                raise serializers.ValidationError("Password does not match")
+            user = User.objects.get(email=email, oauth_platform__isnull=True)
             RefreshToken(refresh_token)
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found")
         except TokenError:
-            raise serializers.ValidationError("Invalid token or expired")
+            raise serializers.ValidationError("Invalid or expired refresh token")
+
+        if not password:
+            raise serializers.ValidationError("Password is required for non-social login users")
+        if not user.check_password(password):
+            raise serializers.ValidationError("Password does not match")
 
         return attrs
 
     class Meta:
         model = User
-        fields = ["email", "password", "access_token", "refresh_token"]
+        fields = ["email", "password", "refresh_token"]
+
+
+class UserSocialAccountDeleteSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    refresh_token = serializers.CharField(required=True)
+    oauth_platform = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        refresh_token = attrs.get("refresh_token")
+        oauth_platform = attrs.get("oauth_platform")
+
+        if not email or not refresh_token:
+            raise serializers.ValidationError("Email and refresh token are required")
+
+        try:
+            user = User.objects.get(email=email, oauth_platform=oauth_platform)
+            RefreshToken(refresh_token)
+        except TokenError:
+            raise serializers.ValidationError("Invalid or expired refresh token")
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User not found")
+
+        return attrs
+
+    class Meta:
+        model = User
+        fields = ["email", "refresh_token", "oauth_platform"]
 
 
 class EmptySerializer(serializers.Serializer):

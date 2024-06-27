@@ -1,6 +1,6 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 
 from afreecatv.pagination import AfreecaTVPagination
 from afreecatv.serializers import AfreecaTvDataSerializer
@@ -15,6 +15,7 @@ class AfreecaTvListAPI(generics.ListAPIView):
     queryset = CommonModel.objects.filter(platform="afreecatv").order_by("-concurrent_viewers")
     serializer_class = AfreecaTvDataSerializer
     pagination_class = AfreecaTVPagination
+    permission_classes = [AllowAny]
 
 
 @extend_schema(tags=["AfreecaTV"])

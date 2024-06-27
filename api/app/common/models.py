@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import CharField, DateTimeField, PositiveIntegerField, TextField, URLField
 
-from common.platforms import Platforms
+from common.platforms import InbangPlatforms
 
 
 class CommonModel(models.Model):
@@ -10,7 +10,7 @@ class CommonModel(models.Model):
     concurrent_viewers: PositiveIntegerField = models.PositiveIntegerField(default=0, null=False)  # 시청자 수
     title: CharField = models.CharField(max_length=255, null=False)  # 방송 제목
     platform: CharField = models.CharField(
-        max_length=50, choices=Platforms.platform_choices, default="youtube", null=False
+        max_length=50, choices=InbangPlatforms.platform_choices, default="youtube", null=False
     )  # 플랫폼
     streaming_link: URLField = models.URLField(max_length=1024, null=False)  # 실시간 방송 링크
     channel_link: URLField = models.URLField(
@@ -32,12 +32,18 @@ class CommonModel(models.Model):
 
 
 class LiveStreamingCategories(models.Model):
-    categories: CharField = models.CharField(max_length=255, null=False)  # 방송 중요
+    categories: CharField = models.CharField(max_length=255, null=False)  # 방송 category
 
     class Meta:
         db_table = "live_streaming_genre_table"
-        verbose_name = "라이브 스트리밍 중요"
-        verbose_name_plural = "라이브 스트리밍 중요 목록"
+        verbose_name = "라이브 스트리밍 Category"
+        verbose_name_plural = "라이브 스트리밍 Category 목록"
 
-    def __str__(self):
-        return f"{self.platform} 에서 방송중인 {self.channel_name}님의 방송 중요 {self.genre}"
+
+class TimeStampedModel(models.Model):
+    created_at: DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: DateTimeField = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+        ordering = ["-created_at", "-updated_at"]

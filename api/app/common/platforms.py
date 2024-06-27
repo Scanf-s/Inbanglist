@@ -2,9 +2,16 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Platforms:
+class InbangPlatforms:
     platform_choices = [
         ("youtube", "YouTube"),
         ("chzzk", "Chzzk"),
         ("afreecatv", "AfreecaTV"),
+    ]
+
+class OAuthPlatforms:
+    platform_choices = [
+        ("", "None"), # None ( default, A user directly signed in with our site )
+        ("google", "Google"), # Google
+        ("naver", "Naver"), # Naver
     ]
