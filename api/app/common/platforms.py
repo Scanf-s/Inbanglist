@@ -9,10 +9,11 @@ class InbangPlatforms:
         ("afreecatv", "AfreecaTV"),
     ]
 
+
 @dataclass
 class OAuthPlatforms:
     platform_choices = [
-        ("none", "None"), # None ( default, A user directly signed in with our site )
-        ("google", "Google"), # Google
-        ("naver", "Naver"), # Naver
+        ("none", "None"),  # None ( default, A user directly signed in with our site )
+        ("google", "Google"),  # Google
+        ("naver", "Naver"),  # Naver
     ]

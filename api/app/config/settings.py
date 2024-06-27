@@ -71,9 +71,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",  # 기본 인증 클래스 설정.
     ),
-    "DEFAULT_PERMISSION_CLASSES": ( # 기본 권한 클래스 설정
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),  # 기본 권한 클래스 설정
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,  # 페이지당 보여줄 갯수 : 10
 }

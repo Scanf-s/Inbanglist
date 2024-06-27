@@ -1,4 +1,4 @@
-from typing import Union, cast, Dict
+from typing import Dict, Union, cast
 
 from django.conf import settings
 from itsdangerous import URLSafeSerializer

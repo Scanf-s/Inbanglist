@@ -3,14 +3,14 @@ from django.urls import path
 from users.views import (
     UserDeleteAPI,
     UserEmailActivationAPI,
-    UserLoginAPI,
-    UserLogoutAPI,
-    UserRegisterAPI,
-    UserNaverLoginAPI,
-    UserNaverLoginCallBackAPI,
-    UserSocialDeleteAPI,
     UserGoogleLoginAPI,
     UserGoogleLoginCallBackAPI,
+    UserLoginAPI,
+    UserLogoutAPI,
+    UserNaverLoginAPI,
+    UserNaverLoginCallBackAPI,
+    UserRegisterAPI,
+    UserSocialDeleteAPI,
 )
 
 urlpatterns = [

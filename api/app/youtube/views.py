@@ -1,6 +1,6 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 
 from common.models import CommonModel
 from youtube.pagination import YoutubePagination

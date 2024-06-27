@@ -93,6 +93,7 @@ class UserDeleteSerializer(serializers.Serializer):
     """
     Normal Account User Delete Serializer
     """
+
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, required=False)
     refresh_token = serializers.CharField()
