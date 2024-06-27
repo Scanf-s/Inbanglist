@@ -7,29 +7,29 @@ from .models import User
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     # 비밀번호 필드를 추가하고, 이 필드를 write_only로 설정하여 응답에 포함되지 않도록 설정
+    username = serializers.CharField()
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    password_verify = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         email = attrs.get("email")
         if User.objects.filter(email=email).exists():  # if there is a user with the same email in the database
             raise serializers.ValidationError("Email already exists")
-        if attrs["password"] != attrs["password_verify"]:  # if user inputs different passwords
-            raise serializers.ValidationError("Password does not match")
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop("password_verify")  # validated_data에서 password_verify를 제거
         user = User.objects.create_user(
+            username=validated_data["username"],
             email=validated_data["email"],
             password=validated_data["password"],
+            oauth_platform="none",
             is_active=False,  # 이메일 인증을 하기 이전이므로 False로 설정
         )
         return user
 
     class Meta:
         model = User
-        fields = ["email", "password", "password_verify"]
+        fields = ["username", "email", "password"]
 
 
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -106,7 +106,7 @@ class UserDeleteSerializer(serializers.Serializer):
             raise serializers.ValidationError("Email and refresh token are required")
 
         try:
-            user = User.objects.get(email=email, oauth_platform__isnull=True)
+            user = User.objects.get(email=email, oauth_platform="none")
             RefreshToken(refresh_token)
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found")

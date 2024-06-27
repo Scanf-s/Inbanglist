@@ -1,7 +1,8 @@
 import os
 import requests
-from typing import Dict, cast
+from typing import Union, Dict
 
+from django.http import HttpResponseRedirect
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 from django.shortcuts import redirect
 from django.core.exceptions import ImproperlyConfigured
@@ -10,7 +11,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
-from common.platforms import OAuthPlatforms
 from .models import User, NaverUserId, GoogleUserId
 from .serializers import (
     EmptySerializer,
@@ -23,6 +23,9 @@ from .serializers import (
 from .tasks import send_activation_email_task
 from .utils import confirm_email_token, generate_email_token, get_jwt_tokens_for_user
 
+# import logging
+#
+# logger = logging.getLogger(__name__)
 
 @extend_schema(tags=["User"])
 class UserRegisterAPI(generics.CreateAPIView):
@@ -36,8 +39,8 @@ class UserRegisterAPI(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save() # is_valid()=True 인 경우만 데이터베이스에 사용자 추가
             # 비동기로 이메일 전송 작업을 큐에 추가
             # Celery를 사용하여 이메일 전송 작업을 백그라운드에서 비동기적으로 처리
             token = generate_email_token(user.email)  # 사용자 정보가 저장된 후, 이메일 인증 토큰을 생성
@@ -111,12 +114,28 @@ class UserLogoutAPI(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(tags=["User"])
+@extend_schema(
+    tags=["User"],
+    parameters=[
+        OpenApiParameter(
+            name='Authorization',
+            description='Authorization token',
+            required=True,
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.HEADER
+        ),
+        OpenApiParameter(name='email', description='Email of the user', required=True, type=str),
+        OpenApiParameter(name='password', description='Password of the user', required=True, type=str),
+        OpenApiParameter(name='refresh_token', description='Refresh token of the user', required=True, type=str),
+    ],
+)
 class UserDeleteAPI(generics.GenericAPIView):
     """
     사용자 회원 탈퇴 API
+    소셜 사용자 회원 탈퇴는 User/OAuth2를 참고해주세요
     """
     serializer_class = UserDeleteSerializer
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs) -> Response:
         serializer = self.get_serializer(data=request.data)
@@ -124,7 +143,7 @@ class UserDeleteAPI(generics.GenericAPIView):
             try:
                 email = serializer.validated_data["email"]
                 refresh_token = serializer.validated_data["refresh_token"]
-                user = User.objects.get(email=email, oauth_platform__isnull=True)
+                user = User.objects.get(email=email, oauth_platform="none")
 
                 # RefreshToken을 블랙리스트에 추가
                 try:
@@ -199,9 +218,13 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
 
 @extend_schema(tags=["User"])
 class UserEmailActivationAPI(generics.GenericAPIView):
+    """
+    사용자 이메일 인증링크를 처리하는 API
+    """
     serializer_class = EmptySerializer
+    permission_classes = [AllowAny]
 
-    def get(self, request, token, *args, **kwargs) -> Response:
+    def get(self, request, token, *args, **kwargs) -> Union[Response, HttpResponseRedirect]:
         email = confirm_email_token(token)
         if email:
             try:
@@ -210,16 +233,7 @@ class UserEmailActivationAPI(generics.GenericAPIView):
                     return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
                 user.is_active = True
                 user.save()  # user's is_active status has changed False to True, save changes into the database
-                jwt_token = get_jwt_tokens_for_user(user)
-
-                return Response(
-                    {
-                        "message": "User created successfully.",
-                        "email": user.email,
-                        "jwt_tokens": jwt_token,
-                    },
-                    status=status.HTTP_201_CREATED,
-                )
+                return redirect(f"{os.getenv('MAIN_DOMAIN')}/activate/{token}")
             except:
                 return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response({"message": "Invalid or Expired activation code"}, status=status.HTTP_400_BAD_REQUEST)
@@ -261,11 +275,11 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> Response:
         # https://developers.naver.com/docs/login/api/api.md
-        naver_client_id = os.getenv("NAVER_CLIENT_ID")
-        naver_client_secret = os.getenv("NAVER_CLIENT_SECRET")
-        state = os.getenv("NAVER_CSRF_STATE")
+        naver_client_id: Union[str, None] = os.getenv("NAVER_CLIENT_ID")
+        naver_client_secret: Union[str, None] = os.getenv("NAVER_CLIENT_SECRET")
+        state: Union[str, None] = os.getenv("NAVER_CSRF_STATE")
 
         if not naver_client_id:
             raise ImproperlyConfigured("NAVER_CLIENT_ID is not set")
@@ -274,24 +288,24 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
         if not state:
             raise ImproperlyConfigured("NAVER_CSRF_STATE is not set")
 
-        authorization_code = request.GET.get("code")
-        received_state = request.GET.get("state")
+        authorization_code: Union[str, None] = request.GET.get("code")
+        received_state: Union[str, None] = request.GET.get("state")
 
         if not authorization_code:
             return Response({"message": "Authorization code is missing"}, status=status.HTTP_400_BAD_REQUEST)
         if received_state != state:
             return Response({"message": "State value does not match"}, status=status.HTTP_400_BAD_REQUEST)
 
-        token_request_url = "https://nid.naver.com/oauth2.0/token"
+        token_request_url: str = "https://nid.naver.com/oauth2.0/token"
         # https://developers.naver.com/docs/login/api/api.md#3-2--%EC%A0%91%EA%B7%BC-%ED%86%A0%ED%81%B0-%EB%B0%9C%EA%B8%89%EA%B0%B1%EC%8B%A0%EC%82%AD%EC%A0%9C-%EC%9A%94%EC%B2%AD
-        token_params = {
+        token_params: Dict = {
             "grant_type": "authorization_code",
             "client_id": naver_client_id,
             "client_secret": naver_client_secret,
             "code": authorization_code,
             "state": state,
         }
-        token_response = requests.post(token_request_url, data=token_params)
+        token_response: Response = requests.post(token_request_url, data=token_params)
         if token_response.status_code != 200:
             return Response({"message": "Failed to get access token"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -326,10 +340,10 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
                 # 새로운 소셜계정 사용자라면
                 user = User.objects.create_social_user(
                     email=user_email,
-                    oauth_platform="naver"
+                    oauth_platform="naver",
+                    username=user_email.split("@")[0],
+                    is_active=True,
                 )
-                user.username = user_email.split("@")[0]
-                user.is_active = True
                 user.save()
             NaverUserId.objects.update_or_create(user=user, defaults={"naver_user_id": user_id}) # 네이버 호출 시 전달받은 user id를 따로 저장
         except Exception as e:
@@ -440,10 +454,10 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
                 # 새로운 소셜계정 사용자라면
                 user = User.objects.create_social_user(
                     email=user_email,
-                    oauth_platform="google"
+                    oauth_platform="google",
+                    username=user_email.split("@")[0],
+                    is_active=True,
                 )
-                user.username = user_email.split("@")[0]
-                user.is_active = True
                 user.save()
             GoogleUserId.objects.update_or_create(user=user, defaults={"google_user_id": user_id})
             # Google 호출 시 전달받은 sub를 user_id 로 사용하여 따로 저장
