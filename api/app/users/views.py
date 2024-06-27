@@ -1,5 +1,6 @@
 import os
-from typing import Dict, Union
+from typing import Union
+from datetime import datetime
 
 import requests
 from django.core.exceptions import ImproperlyConfigured
@@ -72,6 +73,9 @@ class UserLoginAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():  # validate email and password in serializer
             user = serializer.validated_data["user"]
+            user.last_login = datetime.now()
+            user.save()
+
             tokens = get_jwt_tokens_for_user(user)
             return Response(
                 {

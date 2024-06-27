@@ -126,6 +126,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://inbanglist.com",
     "http://www.inbanglist.com",
+    "https://inbanglist.com",
+    "https://www.inbanglist.com",
     "http://localhost:8000",
     "http://localhost:5173",
 ]
