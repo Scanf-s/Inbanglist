@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     is_staff: BooleanField = models.BooleanField(default=False)
     is_active: BooleanField = models.BooleanField(default=False)
     oauth_platform: CharField = models.CharField(
-        max_length=50, choices=OAuthPlatforms.platform_choices, default="", null=True
+        max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True
     )
 
     USERNAME_FIELD = "email"

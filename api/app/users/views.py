@@ -1,11 +1,11 @@
 import os
 from typing import Union
-from datetime import datetime
 
 import requests
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -73,7 +73,7 @@ class UserLoginAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():  # validate email and password in serializer
             user = serializer.validated_data["user"]
-            user.last_login = datetime.now()
+            user.last_login = timezone.now()
             user.save()
             tokens = get_jwt_tokens_for_user(user)
 
