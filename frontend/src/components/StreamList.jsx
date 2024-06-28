@@ -20,7 +20,7 @@ const StreamList = ({ platform }) => {
             if (response.status < 200 || response.status >= 300) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            const data = response.data;
+            const data = response.data.results;
             const sortedData = data.sort((a, b) => b.concurrent_viewers - a.concurrent_viewers);
             const startIndex = (currentPage - 1) * perPage;
             const selectData = sortedData.slice(startIndex, startIndex + perPage);

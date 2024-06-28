@@ -33,7 +33,7 @@ const SignUpPage = () => {
       return;
   }
 
-    signUp(email, password, confirmPassword,
+    signUp(name, email, password,
       () => navigate('/login'), // 성공 시 리디렉트
       (error) => {
         // 에러가 발생하면 전역 상태에 에러를 설정
