@@ -9,6 +9,7 @@ services:
         - DEV=false
     volumes:
       - ./api/app:/app
+      - /var/log/live_streaming_list:/var/log/live_streaming_list  # 로그 파일을 저장할 디렉토리 마운트
     ports:
       - "8000:8000"
     environment:
@@ -18,7 +19,8 @@ services:
     command: >
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers 4 --timeout 120 --log-level debug"
+             gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers 4 --timeout 120 --log-level debug
+             --access-logfile '/var/log/live_streaming_list/access.log' --error-logfile '/var/log/live_streaming_list/error.log'"
     networks:
       - app-network
 
