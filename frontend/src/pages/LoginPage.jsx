@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import Modal from '../components/common/GlobalModal';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate = useNavigate();
     // 로그인 버튼 클릭 이벤트 함수
     const { login, isAuthenticated, error, setError, showModal, clearError } = useAuthStore();
     const handleLogin = async (e) => {
@@ -18,11 +18,18 @@ const LoginPage = () => {
             setError('이메일 형식이 올바르지 않습니다.');
             return;
         }
-        
-        // 인증 여부 확인
-        // if(!isAuthenticated) {}
 
-        await login(email, password);
+        // 인증 여부 확인
+        if(!isAuthenticated) { 
+            setError("이메일 인증을 완료하세요");
+        }
+
+        // 로그인 함수 호출
+        await login(
+            email,
+            password,
+            () => navigate('/'),
+        );
     };
 
     useEffect(() => {
