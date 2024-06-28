@@ -1,20 +1,27 @@
 import { IoInformationCircleOutline } from 'react-icons/io5';
-import { FaPlay } from 'react-icons/fa';
 import DetailModal from './common/DetailModal';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 const StreamItem = ({ stream }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
+    const [imgSrc, setImgSrc] = useState(
+        stream.thumbnail ? stream.thumbnail : 'https://via.placeholder.com/400x240'
+    );
+
+    const handleError = () => {
+        setImgSrc('https://via.placeholder.com/400x240');
+    };
+
     return (
         <div className='relative'>
             <div>
                 <img
-                    src='https://via.placeholder.com/400x240'
+                    src={imgSrc}
                     alt={stream.title}
                     className='block w-full h-auto rounded-md'
+                    onError={handleError}
                 />
             </div>
             <div
@@ -29,11 +36,7 @@ const StreamItem = ({ stream }) => {
                         {stream.concurrent_viewers}명 시청중
                     </div>
                 </div>
-                <div id='card__play' className=' flex-grow w-full h-full flex'>
-                    <Link to='' className='m-auto'>
-                        <FaPlay className=' w-10 h-8 text-white' />
-                    </Link>
-                </div>
+                <div id='card__play' className=' flex-grow w-full h-full flex'></div>
                 <div
                     id='card__info'
                     className='flex flex-row justify-between w-full items-center md:invisible lg:visible'>

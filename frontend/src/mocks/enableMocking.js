@@ -7,5 +7,6 @@ export const enableMocking = async () => {
             url: '/mockServiceWorker.js',
         },
         quiet: true,
+        onUnhandledRequest: 'bypass',
     });
 };
