@@ -7,6 +7,7 @@ class InbangPlatforms:
         ("youtube", "YouTube"),
         ("chzzk", "Chzzk"),
         ("afreecatv", "AfreecaTV"),
+        ("twitch", "Twitch"),
     ]
 
 

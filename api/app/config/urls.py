@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 
+from common.permissions import IsAdminUser
 from common.views import RootView
 
 urlpatterns = [
@@ -12,15 +13,15 @@ urlpatterns = [
     path("api/v1/chzzk/", include("chzzk.urls")),
     path("api/v1/youtube/", include("youtube.urls")),
     path("api/users/", include("users.urls")),
-    path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/v1/schema", SpectacularAPIView.as_view(permission_classes=[IsAdminUser]), name="schema"),
     path(
-        "api/v1/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
+        "api/v1/docs",
+        SpectacularSwaggerView.as_view(url_name="schema", permission_classes=[IsAdminUser]),
         name="swagger-ui",
     ),
-    path("api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/v1/redoc", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
 # 추후, 프론트 제공 시 제거할 코드임!!!
