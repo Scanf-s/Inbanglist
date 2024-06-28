@@ -4,5 +4,5 @@ from afreecatv.views import AfreecaTvListAPI, AfreecaTvRetrieveUpdateDestroyAPI
 
 urlpatterns = [
     path("", AfreecaTvListAPI.as_view(), name="afreecatv_list_create"),
-    path("<int:pk>/", AfreecaTvRetrieveUpdateDestroyAPI.as_view(), name="afreecatv_retrieve_update_destroy"),
+    path("<int:pk>", AfreecaTvRetrieveUpdateDestroyAPI.as_view(), name="afreecatv_retrieve_update_destroy"),
 ]

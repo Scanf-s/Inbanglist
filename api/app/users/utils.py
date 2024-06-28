@@ -1,7 +1,10 @@
-from typing import Union
+from typing import Dict, Union, cast
 
 from django.conf import settings
 from itsdangerous import URLSafeSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from users.models import User
 
 
 def generate_email_token(user_email: str) -> str:
@@ -22,3 +25,11 @@ def confirm_email_token(token, expiration=3600) -> Union[str, bool]:
     except:
         return False
     return email
+
+
+def get_jwt_tokens_for_user(user: User) -> Dict[str, str]:
+    refresh: RefreshToken = cast(RefreshToken, RefreshToken.for_user(user))
+    return {
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+    }
