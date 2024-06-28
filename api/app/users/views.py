@@ -75,8 +75,8 @@ class UserLoginAPI(generics.GenericAPIView):
             user = serializer.validated_data["user"]
             user.last_login = datetime.now()
             user.save()
-
             tokens = get_jwt_tokens_for_user(user)
+
             return Response(
                 {
                     "message": "Login successful",
