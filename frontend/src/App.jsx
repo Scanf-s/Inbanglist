@@ -7,7 +7,11 @@ import SignUpPage from './pages/SignUpPage';
 import { useDarkModeStore } from './store/darkMode';
 import { useEffect } from 'react';
 import GlobalModal from './components/common/GlobalModal';
+<<<<<<< HEAD
 import useAuthStore from './store/authStore';
+=======
+import UserInfo from './pages/UserInfo';
+>>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
 
 function App() {
   const { initializeDarkMode } = useDarkModeStore();
@@ -26,6 +30,11 @@ function App() {
         </Route>
         <Route path='login' element={<LoginPage />} />
         <Route path='signUp' element={<SignUpPage />} />
+<<<<<<< HEAD
+=======
+        <Route path='activate/:token' element={<Activate />} />
+        <Route path='user' element={<UserInfo />} />
+>>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
       </Routes>
       <GlobalModal />
     </>
