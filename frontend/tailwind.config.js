@@ -6,7 +6,16 @@ export default {
             padding: 0,
             margin: 0,
         },
-        extend: {},
+        extend: {
+            animation: {
+                'ping-slow': 'ping 1.5s linear infinite',
+                'spin-slow': 'spin 2s linear infinite',
+            },
+            fontFamily: {
+                sans: ['Poppins', 'ui-sans-serif', 'system-ui'],
+            },
+        },
+        important: true,
     },
     darkMode: 'class',
     plugins: [],

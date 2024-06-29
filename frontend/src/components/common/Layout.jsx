@@ -3,9 +3,9 @@ import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
     return (
-        <div className='min-w-screen min-h-screen'>
+        <div className='min-w-screen min-h-screen bg-[#f5f7fa] dark:bg-slate-900'>
             <NavBar />
-            <div className='w-full max-h-[calc(100vh-68px)] dark:bg-slate-700 bg-white'>
+            <div className='w-full max-h-[calc(100vh-68px)] bg-[#f5f7fa] dark:bg-slate-900'>
                 <Outlet />
             </div>
         </div>
