@@ -6,9 +6,11 @@ from afreecatv.pagination import AfreecaTVPagination
 from afreecatv.serializers import AfreecaTvDataSerializer
 from common.models import CommonModel
 
+import logging
 # 참고 링크
 # https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
 
+logger = logging.getLogger(__name__)
 
 @extend_schema(tags=["AfreecaTV"])
 class AfreecaTvListAPI(generics.ListAPIView):
@@ -16,6 +18,12 @@ class AfreecaTvListAPI(generics.ListAPIView):
     serializer_class = AfreecaTvDataSerializer
     pagination_class = AfreecaTVPagination
     permission_classes = [AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        logger.info("Called AfreecaTvListAPI")
+        response = super().list(request, *args, **kwargs)
+        logger.info(f"Response Status Code: {response.status_code}")
+        return response
 
 
 @extend_schema(tags=["AfreecaTV"])

@@ -6,6 +6,9 @@ from chzzk.pagination import ChzzkPagination
 from chzzk.serializers import ChzzkDataSerializer
 from common.models import CommonModel
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 참고 링크
 # https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
@@ -16,6 +19,11 @@ class ChzzkListAPI(generics.ListAPIView):
     pagination_class = ChzzkPagination
     permission_classes = [AllowAny]
 
+    def list(self, request, *args, **kwargs):
+        logger.info("Called ChzzkListAPI")
+        response = super().list(request, *args, **kwargs)
+        logger.info(f"Response Status Code: {response.status_code}")
+        return response
 
 @extend_schema(tags=["Chzzk"])
 class ChzzkRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):

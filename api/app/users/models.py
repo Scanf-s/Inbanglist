@@ -50,6 +50,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     email: EmailField = models.EmailField(max_length=255, unique=True, null=False)
     username: CharField = models.CharField(max_length=255, null=True)
+    profile_image: CharField = models.CharField(max_length=255, null=True, default=None) # aws s3 url
     is_staff: BooleanField = models.BooleanField(default=False)
     is_active: BooleanField = models.BooleanField(default=False)
     oauth_platform: CharField = models.CharField(
