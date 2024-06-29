@@ -53,7 +53,7 @@ const useAuthStore = create((set) => ({
         try {
             console.log('Attempting login'); // 디버깅 로깅
             // useAuthStore.getState().requestToken(email, password);
-            const response = await axios.post('/api/users/login/', {
+            const response = await axios.post('/api/users/login', {
                 email,
                 password,
             });
@@ -70,24 +70,10 @@ const useAuthStore = create((set) => ({
         }
     },
 
-    // 인증 정보 확인 요망
-    activateAccount: async (token) => {
-        try {
-            console.log('Activating account'); // 디버깅 로깅
-            const response = await axios.get(`/api/users/activate/${token}`);
-            console.log('Activation successful:', response.data); // 디버깅 로깅
-            const { access, refresh } = response.data.jwt_tokens;
-            saveTokens(access, refresh);
-        } catch (error) {
-            console.error('Activation error:', error);
-            setError('이메일 인증에 실패하였습니다. 다시 시도하세요.', error);
-        }
-    },
-
     signUp: async (name, email, password, onSuccess, onError) => {
         try {
             console.log('Attempting sign up'); // 디버깅 로깅
-            await axios.post('/api/users/register/', {
+            await axios.post('/api/users/register', {
                 username: name,
                 email,
                 password,
@@ -104,36 +90,7 @@ const useAuthStore = create((set) => ({
             onError(errorMessage);
         }
     },
-    // refreshAccessToken: async () => {
-    //     try {
-    //       console.log('Refreshing access token'); // 디버깅 로깅
-    //       const refreshToken = useAuthStore.getState().refreshToken;
-    //       const response = await axios.post('/api/users/token/refresh/', {
-    //         refresh: refreshToken,
-    //       });
-    //       console.log('Token refresh successful:', response.data);
-    //       const { access } = response.data;
-    //       useAuthStore.getState().saveTokens(access, refreshToken);
-    //     } catch (error) {
-    //       console.error('Token refresh error:', error);
-    //       useAuthStore.getState().setError('토큰 갱신에 실패하였습니다. 다시 로그인하세요.');
-    //       useAuthStore.getState().clearTokens();
-    //     }
-    //   },
-    // requestToken: async (email, password) => {
-    //     try {
-    //         console.log('Attempting token'); // 디버깅 로깅
-    //         const response = await axios.post('/api/token/', {
-    //             email,
-    //             password,
-    //         })
-    //         saveTokens(response.data);
-    //         console.log('Token successful',response.data); // 디버깅
-    //     } catch (error) {
-    //         console.log('Not response Refresh Token.')
-    //     }
-    // },
-    // deleteAccount: async (token) => {},
+
 }));
 
 export default useAuthStore;
