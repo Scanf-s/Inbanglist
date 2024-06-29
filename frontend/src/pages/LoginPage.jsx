@@ -19,13 +19,16 @@ const LoginPage = () => {
             return;
         }
 
-        // 인증 여부 확인
-        if (!isAuthenticated) {
-            setError('이메일 인증을 완료하세요');
-        }
-
         // 로그인 함수 호출
         await login(email, password, () => navigate('/'));
+    };
+
+    const handleNaverLogin = () => {
+        window.open(
+            '/api/users/oauth2/naver/login',
+            '_blank',
+            'noopener,noreferrer,width=600,height=600'
+        );
     };
 
     useEffect(() => {
@@ -35,6 +38,11 @@ const LoginPage = () => {
             }, 3000);
         }
     }, [showModal, clearError]);
+
+    const openGoogleLogin = () => {
+        const googleLoginUrl = '/api/users/oauth2/google/login';
+        window.open(googleLoginUrl, 'googleLogin', 'noopener,noreferrer,width=600,height=600');
+    };
 
     return (
         <div className='h-screen w-screen bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] dark:from-[#537895] dark:to-[#09203f]'>
@@ -71,7 +79,7 @@ const LoginPage = () => {
                         <form className='flex flex-col gap-4 border-t-[1px] border-t-slate-300 dark:text-[#c3cfe2]'>
                             <p className='mt-8 mb-2 text-center'>소셜로 간편하게 로그인하세요</p>
                             <button
-                                className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#166ae5] text-[#166ae5] hover:bg-[#e7f0fd] dark:hover:bg-[#bac8e0]'
+                                className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#166ae5] text-[#166ae5] hover:bg-[#e7f0fd]'
                                 type='submit'>
                                 <img
                                     className='w-[25px] absolute left-6'
@@ -80,6 +88,7 @@ const LoginPage = () => {
                                 구글 로그인
                             </button>
                             <button
+                                onClick={handleNaverLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#65A23F] text-[#65A23F] hover:bg-[#deecdd]'
                                 type='submit'>
                                 <img
