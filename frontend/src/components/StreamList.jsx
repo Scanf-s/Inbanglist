@@ -27,7 +27,7 @@ const StreamList = ({ platform }) => {
             if (response.status < 200 || response.status >= 300) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+            console.log(response.data.results);
             const newStreams = response.data.results.sort(
                 (a, b) => b.concurrent_viewers - a.concurrent_viewers
             );
@@ -58,10 +58,10 @@ const StreamList = ({ platform }) => {
     }, [handleScroll]);
 
     return (
-        <div className='max-h-[calc(100vh-100px)]'>
-            <h1 className='text-2xl p-3 text-black dark:text-white'>{platform}</h1>
+        <div className='max-h-[calc(100vh-100px)] border dark:border-slate-700 rounded-xl px-4 bg-white dark:bg-slate-800 shadow-md'>
+            <h1 className='text-2xl p-3 text-black dark:text-[#f5f7fa]'>{platform}</h1>
             <div
-                className='flex flex-col gap-6 max-h-[calc(100vh-156px)] scroll-smooth scroll_custom'
+                className='flex flex-col gap-6 max-h-[calc(100vh-157px)] scroll-smooth scroll_custom'
                 ref={ref}>
                 {streams?.map((stream) => (
                     <StreamItem key={stream.id} stream={stream} />
