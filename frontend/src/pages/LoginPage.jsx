@@ -19,17 +19,16 @@ const LoginPage = () => {
             return;
         }
 
-        // 인증 여부 확인
-        if(!isAuthenticated) { 
-            setError("이메일 인증을 완료하세요");
-        }
-
         // 로그인 함수 호출
         await login(
             email,
             password,
             () => navigate('/'),
         );
+    };
+
+    const handleNaverLogin = () => {
+        window.open('/api/users/oauth2/naver/login', '_blank', 'noopener,noreferrer,width=600,height=600');
     };
 
     useEffect(() => {
@@ -79,6 +78,7 @@ const LoginPage = () => {
                                 구글 로그인
                             </button>
                             <button
+                                onClick={handleNaverLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#65A23F] text-[#65A23F] hover:bg-[#deecdd]'
                                 type='submit'>
                                 <img className='w-[25px] absolute left-6' src='/Naver_logo_initial.svg.png' />
