@@ -1,7 +1,9 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
+from rest_framework.permissions import AllowAny, IsAdminUser
 
 from common.models import CommonModel
+from youtube.pagination import YoutubePagination
 from youtube.serializers import YoutubeDataSerializer
 
 # 참고 링크
@@ -9,12 +11,15 @@ from youtube.serializers import YoutubeDataSerializer
 
 
 @extend_schema(tags=["Youtube"])
-class YoutubeListCreateAPI(generics.ListCreateAPIView):
-    queryset = CommonModel.objects.filter(platform="youtube")
+class YoutubeListAPI(generics.ListAPIView):
+    queryset = CommonModel.objects.filter(platform="youtube").order_by("-concurrent_viewers")
     serializer_class = YoutubeDataSerializer
+    pagination_class = YoutubePagination
+    permission_classes = [AllowAny]
 
 
 @extend_schema(tags=["Youtube"])
 class YoutubeRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = CommonModel.objects.filter(platform="youtube")
     serializer_class = YoutubeDataSerializer
+    permission_classes = [IsAdminUser]

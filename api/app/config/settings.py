@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os  # os와 상호작용을 위해 사용
+import sys
 from datetime import timedelta  # 시간 간격 표현 모듈
 from pathlib import Path  # 파일 경로 다루는 모듈
 
@@ -70,6 +71,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",  # 기본 인증 클래스 설정.
     ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),  # 기본 권한 클래스 설정
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,  # 페이지당 보여줄 갯수 : 10
 }
 
 # 요청과 응답을 처리하는 미들웨어 목록
@@ -99,9 +103,9 @@ django-cors-headers 패키지는 Django 애플리케이션에서 CORS 설정을 
 CORS_ALLOW_METHODS = [
     "GET",
     "OPTIONS",
-    "PATCH",
     "POST",
     "PUT",
+    "DELETE",
 ]
 
 # 허용할 HTTP Header
@@ -122,15 +126,11 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://inbanglist.com",
     "http://www.inbanglist.com",
+    "https://inbanglist.com",
+    "https://www.inbanglist.com",
     "http://localhost:8000",
     "http://localhost:5173",
 ]
-
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://\w+\.inbanglist\.com$",
-]
-
-CORS_ALLOW_ALL_ORIGINS = False
 
 # 프로젝트의 루트 URL 설정 파일
 ROOT_URLCONF = "config.urls"
@@ -191,7 +191,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
@@ -220,8 +220,10 @@ AUTH_USER_MODEL = "users.User"
 # Simple JWT Token Configurations
 # SIMPLE JWT
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
     "SIGNING_KEY": "SECRET",
     "ALGORITHM": "HS256",
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -242,3 +244,48 @@ SPECTACULAR_SETTINGS = {
         {"name": "Youtube", "description": "유튜브 라이브 API"},
     ],
 }
+
+# Email Verification
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Celery Configurations
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+
+# Logging
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'DEBUG',
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
+
+# 테스트 설정
+if "test" in sys.argv:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
+    EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"

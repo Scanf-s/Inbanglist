@@ -16,7 +16,34 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings
       - WERKZEUG_DEBUG_PIN=off
+      - TZ="Asia/Seoul"
     command: >
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py migrate &&
              python manage.py runserver_plus 0.0.0.0:8000"
+    networks:
+      - app-network
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  celery:
+    build:
+      context: ./api
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - ./api/app:/app
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
