@@ -8,7 +8,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
     // 로그인 버튼 클릭 이벤트 함수
-    const { login, isAuthenticated, error, setError, showModal, clearError } = useAuthStore();
+    const { login, error, setError, showModal, clearError } = useAuthStore();
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -23,14 +23,6 @@ const LoginPage = () => {
         await login(email, password, () => navigate('/'));
     };
 
-    const handleNaverLogin = () => {
-        window.open(
-            '/api/users/oauth2/naver/login',
-            '_blank',
-            'noopener,noreferrer,width=600,height=600'
-        );
-    };
-
     useEffect(() => {
         if (showModal) {
             setTimeout(() => {
@@ -38,6 +30,10 @@ const LoginPage = () => {
             }, 3000);
         }
     }, [showModal, clearError]);
+
+    const handleNaverLogin = () => {
+        window.open('/api/users/oauth2/naver/login', '_blank', 'noopener,noreferrer,width=600,height=600');
+    };
 
     const openGoogleLogin = () => {
         const googleLoginUrl = '/api/users/oauth2/google/login';
@@ -79,22 +75,17 @@ const LoginPage = () => {
                         <form className='flex flex-col gap-4 border-t-[1px] border-t-slate-300 dark:text-[#c3cfe2]'>
                             <p className='mt-8 mb-2 text-center'>소셜로 간편하게 로그인하세요</p>
                             <button
+                                onClick={openGoogleLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#166ae5] text-[#166ae5] hover:bg-[#e7f0fd]'
                                 type='submit'>
-                                <img
-                                    className='w-[25px] absolute left-6'
-                                    src='/Google__G__logo.svg.png'
-                                />
+                                <img className='w-[25px] absolute left-6' src='/Google__G__logo.svg.png' />
                                 구글 로그인
                             </button>
                             <button
                                 onClick={handleNaverLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#65A23F] text-[#65A23F] hover:bg-[#deecdd]'
                                 type='submit'>
-                                <img
-                                    className='w-[25px] absolute left-6'
-                                    src='/Naver_logo_initial.svg.png'
-                                />
+                                <img className='w-[25px] absolute left-6' src='/Naver_logo_initial.svg.png' />
                                 네이버 로그인
                             </button>
                         </form>

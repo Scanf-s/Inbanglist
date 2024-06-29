@@ -1,30 +1,28 @@
 import { Link } from 'react-router-dom';
 import { useDarkModeStore } from '../../store/darkMode';
 import useAuthStore from '../../store/authStore';
-import { useEffect, useState } from 'react';
 
 const NavBar = () => {
-    const { toggleDarkMode } = useDarkModeStore();
-    const [isLogin, setIsLogin] = useState(true);
-    const { user, logout } = useAuthStore();
-
-    useEffect(() => {
-        if (user) {
-            setIsLogin(true);
-        }
-    }, []);
+    const user = useAuthStore((state) => state.user);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const logout = useAuthStore((state) => state.logout);
+    const navigateToAdminDocs = useAuthStore((state) => state.navigateToAdminDocs);
 
     return (
         <div className='flex justify-between items-center dark:bg-slate-700 bg-[#c3cfe2] p-4 h-[68px]'>
             <Link to='/' className='flex items-center gap-1 md:gap-2'>
                 <img className='w-8 h-8 md:w-10 md:h-10' src='/inbanglist-logo.svg' />
-                <h1 className='text-lg md:text-[22px] dark:text-[#f5f7fa] text-black'>
-                    INBANGLIST
-                </h1>
+                <h1 className='text-lg md:text-[22px] dark:text-[#f5f7fa] text-black'>INBANGLIST</h1>
             </Link>
             <div className='flex items-center gap-1 md:gap-2'>
-                {user ? (
+                {isAuthenticated ? (
                     <div className='text-center cursor-pointer tracking-wide dark:text-[#f5f7fa] text-black'>
+                        <button to='/api/v1/docs' className='inline-block mr-3 underline' onClick={navigateToAdminDocs}>
+                            Admin Docs
+                        </button>
+                        <Link to='/user' className='inline-block mr-3'>
+                            회원 정보
+                        </Link>
                         <Link to='/login' className='inline-block' onClick={logout}>
                             로그아웃
                         </Link>
