@@ -39,6 +39,7 @@ async def afreecatv_crawling(page, soup):
     channel_names = []
     live_viewers = []
     channel_links = []
+    channel_profile_images = []
 
     html = await page.content()
     soup = soup(html, "html.parser")
@@ -56,6 +57,9 @@ async def afreecatv_crawling(page, soup):
         img = thumbnail.find("img")
         if img and 'src' in img.attrs:
             thumbnails.append("https:" + img['src'])
+        else:
+            thumbnails.append("secret thmbnaik")
+
         titles.append(title.text)
         channel_names.append(channel_name.text)
 
@@ -66,6 +70,9 @@ async def afreecatv_crawling(page, soup):
         if channel_link.get('href'):
             channel_links.append(channel_link.get('href'))
 
+        profile_img = channel_link.find("img")
+        if profile_img.get("src"):
+            channel_profile_images.append(profile_img['src'])
 
     print("Afreeca")
     print("Links:", len(links))
@@ -74,11 +81,12 @@ async def afreecatv_crawling(page, soup):
     print("Channel Names:", len(channel_names))
     print("Live Viewers:", len(live_viewers))
     print("Channel Links:", len(channel_links))
+    print("channel_profile_images:", len(channel_profile_images))
 
-    datas = zip(thumbnails, links, titles, channel_names, live_viewers, channel_links)
+    datas = zip(thumbnails, links, titles, channel_names, live_viewers, channel_links, channel_profile_images)
 
     live_data_list = []
-    for thumbnail, streaming_link, title, channel_name, concurrent_viewers, channel_link in datas:
+    for thumbnail, streaming_link, title, channel_name, concurrent_viewers, channel_link, channel_profile_image in datas:
         live_data_list.append({
             'channel_name': channel_name,
             'thumbnail': thumbnail,
@@ -88,9 +96,10 @@ async def afreecatv_crawling(page, soup):
             'streaming_link': streaming_link,
             'channel_link': channel_link,
             'channel_description': "",
-            'followers': 0,
+            'channel_followers': 0,
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'channel_profile_image': channel_profile_image
         })
 
     return live_data_list
