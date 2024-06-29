@@ -74,6 +74,7 @@ async def afreecatv_crawling(page, soup):
         if profile_img.get("src"):
             channel_profile_images.append(profile_img['src'])
 
+
     print("Afreeca")
     print("Links:", len(links))
     print("Thumbnails:", len(thumbnails))
@@ -87,6 +88,12 @@ async def afreecatv_crawling(page, soup):
 
     live_data_list = []
     for thumbnail, streaming_link, title, channel_name, concurrent_viewers, channel_link, channel_profile_image in datas:
+
+
+    datas = zip(thumbnails, links, titles, channel_names, live_viewers, channel_links)
+
+    live_data_list = []
+    for thumbnail, streaming_link, title, channel_name, concurrent_viewers, channel_link in datas:
         live_data_list.append({
             'channel_name': channel_name,
             'thumbnail': thumbnail,
@@ -100,6 +107,7 @@ async def afreecatv_crawling(page, soup):
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'channel_profile_image': channel_profile_image
+
         })
 
     return live_data_list

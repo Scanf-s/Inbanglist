@@ -17,6 +17,7 @@ async def chzzk_crawling(page, soup):
     channel_names = []
     live_viewers = []
     channel_links = []
+
     channel_profile_images = []
 
     html = await page.content()
@@ -45,10 +46,11 @@ async def chzzk_crawling(page, soup):
         if channel_link.get('href'):
             channel_link = "https://chzzk.naver.com" + channel_link.get('href')
             channel_links.append(channel_link)
-
+            
         profile_image = channel_profile_image.find("img")
         if 'src' in profile_image.attrs:
             channel_profile_images.append(profile_image['src'])
+
     
     print("chzzk")
     print("Links:", len(links))
@@ -76,6 +78,7 @@ async def chzzk_crawling(page, soup):
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'channel_profile_image': channel_profile_image
+
         })
 
     return live_data_list
