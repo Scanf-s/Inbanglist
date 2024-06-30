@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Union
 
@@ -15,17 +16,16 @@ from users.models import User
 from users.serializers import (
     EmptySerializer,
     UserDeleteSerializer,
+    UserInfoSerializer,
     UserLoginSerializer,
     UserLogoutSerializer,
     UserRegisterSerializer,
-    UserInfoSerializer,
 )
 from users.tasks import send_activation_email_task
 from users.utils import confirm_email_token, generate_email_token, get_jwt_tokens_for_user
 
-import logging
-
 logger = logging.getLogger(__name__)
+
 
 @extend_schema(tags=["User"])
 class UserRegisterAPI(generics.CreateAPIView):
@@ -176,20 +176,25 @@ class UserDeleteAPI(generics.GenericAPIView):
 class UserInfoAPI(generics.RetrieveAPIView):
     serializer_class = UserInfoSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication] # JWTAuthentication가 요청 헤더에서 access_token을 자동으로 추출하고 유효성 검사
+    authentication_classes = [
+        JWTAuthentication
+    ]  # JWTAuthentication가 요청 헤더에서 access_token을 자동으로 추출하고 유효성 검사
 
     def get(self, request, *args, **kwargs):
         user = self.request.user
         serializer = self.get_serializer(user)
-        return Response(data={
-            "message": "User data fetched successfully",
-            "user": {
-                "username": serializer.data["username"],
-                "email": serializer.data["email"],
-                "user_profile_image": "https://www.example.com", # serializer.data.get("profile_image", None),
-                "oauth_platform": serializer.data.get("oauth_platform", None),
-            }
-        }, status=status.HTTP_200_OK)
+        return Response(
+            data={
+                "message": "User data fetched successfully",
+                "user": {
+                    "username": serializer.data["username"],
+                    "email": serializer.data["email"],
+                    "user_profile_image": "https://www.example.com",  # serializer.data.get("profile_image", None),
+                    "oauth_platform": serializer.data.get("oauth_platform", None),
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema(tags=["User"])

@@ -1,3 +1,5 @@
+import logging
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -5,8 +7,6 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from common.models import CommonModel
 from youtube.pagination import YoutubePagination
 from youtube.serializers import YoutubeDataSerializer
-
-import logging
 
 logger = logging.getLogger(__name__)
 # 참고 링크

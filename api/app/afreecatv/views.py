@@ -1,3 +1,5 @@
+import logging
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -6,11 +8,11 @@ from afreecatv.pagination import AfreecaTVPagination
 from afreecatv.serializers import AfreecaTvDataSerializer
 from common.models import CommonModel
 
-import logging
 # 참고 링크
 # https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
 
 logger = logging.getLogger(__name__)
+
 
 @extend_schema(tags=["AfreecaTV"])
 class AfreecaTvListAPI(generics.ListAPIView):

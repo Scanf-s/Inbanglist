@@ -3,17 +3,17 @@ from django.urls import path
 from users.views.auth_views import (
     UserDeleteAPI,
     UserEmailActivationAPI,
+    UserInfoAPI,
     UserLoginAPI,
     UserLogoutAPI,
     UserRegisterAPI,
-    UserInfoAPI,
 )
 from users.views.social_auth_views import (
-    UserSocialDeleteAPI,
     UserGoogleLoginAPI,
     UserGoogleLoginCallBackAPI,
     UserNaverLoginAPI,
     UserNaverLoginCallBackAPI,
+    UserSocialDeleteAPI,
 )
 
 urlpatterns = [

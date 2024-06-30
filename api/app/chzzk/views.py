@@ -1,3 +1,5 @@
+import logging
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -6,9 +8,8 @@ from chzzk.pagination import ChzzkPagination
 from chzzk.serializers import ChzzkDataSerializer
 from common.models import CommonModel
 
-import logging
-
 logger = logging.getLogger(__name__)
+
 
 # 참고 링크
 # https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
@@ -24,6 +25,7 @@ class ChzzkListAPI(generics.ListAPIView):
         response = super().list(request, *args, **kwargs)
         logger.info(f"Response Status Code: {response.status_code}")
         return response
+
 
 @extend_schema(tags=["Chzzk"])
 class ChzzkRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):

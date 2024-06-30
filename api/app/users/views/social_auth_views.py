@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import os
-from typing import Union
 
 import requests
 from django.core.exceptions import ImproperlyConfigured
@@ -14,10 +15,7 @@ from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from users.models import GoogleUserId, NaverUserId, User
-from users.serializers import (
-    EmptySerializer,
-    UserSocialAccountDeleteSerializer,
-)
+from users.serializers import EmptySerializer, UserSocialAccountDeleteSerializer
 from users.utils import get_jwt_tokens_for_user
 
 
@@ -34,7 +32,10 @@ from users.utils import get_jwt_tokens_for_user
         OpenApiParameter(name="email", description="Email of the user", required=True, type=str),
         OpenApiParameter(name="refresh_token", description="Refresh token of the user", required=True, type=str),
         OpenApiParameter(
-            name="oauth_platform", description="OAuth platform (e.g., google, naver) none : email signed up user", required=True, type=str
+            name="oauth_platform",
+            description="OAuth platform (e.g., google, naver) none : email signed up user",
+            required=True,
+            type=str,
         ),
     ],
 )
@@ -66,7 +67,9 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
                     refresh_token_instance = RefreshToken(refresh_token)
                     refresh_token_instance.blacklist()
                 except TokenError as e:
-                    return Response({"message": "Invalid refresh token", "error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {"message": "Invalid refresh token", "error": str(e)}, status=status.HTTP_400_BAD_REQUEST
+                    )
 
                 # 사용자가 소유한 모든 OutstandingToken 삭제
                 OutstandingToken.objects.filter(user=user).delete()
@@ -177,16 +180,20 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
 
         # 사용자 존재 여부 확인해서 새로운 사용자를 생성하거나 기존 사용자가 있다면, 로그인
         try:
-            user: Union[User, None] = User.objects.filter(email=user_email, oauth_platform="naver").first()
+            user: User | None = User.objects.filter(email=user_email, oauth_platform="naver").first()
             if not user:
                 user = User.objects.create_social_user(
                     email=user_email,
                     oauth_platform="naver",
                     username=user_email.split("@")[0],
+                    last_login=timezone.now(),
+                    is_active=True,
                 )
-            user.last_login = timezone.now()
-            user.is_active = True
-            user.save()
+            else:
+                user.last_login = timezone.now()
+                user.is_active = True
+                user.save()
+
             NaverUserId.objects.update_or_create(user=user, defaults={"naver_user_id": user_id})
         except Exception as e:
             return Response(
