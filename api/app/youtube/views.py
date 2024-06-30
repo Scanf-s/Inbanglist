@@ -1,3 +1,5 @@
+import logging
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -6,6 +8,7 @@ from common.models import CommonModel
 from youtube.pagination import YoutubePagination
 from youtube.serializers import YoutubeDataSerializer
 
+logger = logging.getLogger(__name__)
 # 참고 링크
 # https://www.django-rest-framework.org/api-guide/generic-views/#concrete-view-classes
 
@@ -16,6 +19,12 @@ class YoutubeListAPI(generics.ListAPIView):
     serializer_class = YoutubeDataSerializer
     pagination_class = YoutubePagination
     permission_classes = [AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET /api/v1/youtube")
+        response = super().list(request, *args, **kwargs)
+        logger.info(f"Response Status Code: {response.status_code}")
+        return response
 
 
 @extend_schema(tags=["Youtube"])

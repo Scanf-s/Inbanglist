@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   api:
+    user: django-user
     env_file:
       - .env
     build:
@@ -9,7 +10,7 @@ services:
         - DEV=false
     volumes:
       - ./api/app:/app
-      - /var/log/live_streaming_list:/var/log/live_streaming_list  # 로그 파일을 저장할 디렉토리 마운트
+      - ./logs:/var/log/live_streaming_list:rw
     ports:
       - "8000:8000"
     environment:
@@ -17,10 +18,11 @@ services:
       - WERKZEUG_DEBUG_PIN=off
       - TZ="Asia/Seoul"
     command: >
-      sh -c "python manage.py collectstatic --noinput &&
+      sh -c "mkdir -p /app/logs &&
+             python manage.py collectstatic --noinput &&
              python manage.py migrate &&
-             gunicorn --bind 0.0.0.0:8000 config.wsgi:application --workers 4 --timeout 120 --log-level debug
-             --access-logfile '/var/log/live_streaming_list/access.log' --error-logfile '/var/log/live_streaming_list/error.log'"
+             gunicorn --bind 0.0.0.0:8000 config.asgi:application --workers 4 --worker-class uvicorn.workers.UvicornWorker --timeout 120 --log-level debug
+             --access-logfile /app/logs/access.log --error-logfile /app/logs/error.log"
     networks:
       - app-network
 
@@ -34,7 +36,7 @@ services:
   celery:
     build:
       context: ./api
-    command: celery -A config worker --loglevel=info
+    command: sh -c "mkdir -p /app/logs && celery -A config worker --loglevel=info"
     volumes:
       - ./api/app:/app
     env_file:

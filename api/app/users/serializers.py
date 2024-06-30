@@ -140,7 +140,7 @@ class UserSocialAccountDeleteSerializer(serializers.Serializer):
             raise serializers.ValidationError("Email and refresh token are required")
 
         try:
-            user = User.objects.get(email=email, oauth_platform=oauth_platform)
+            User.objects.get(email=email, oauth_platform=oauth_platform)
             RefreshToken(refresh_token)
         except TokenError:
             raise serializers.ValidationError("Invalid or expired refresh token")
@@ -152,6 +152,13 @@ class UserSocialAccountDeleteSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ["email", "refresh_token", "oauth_platform"]
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # fields = ["username", "email", "profile_image", "oauth_platform"]
+        fields = ["username", "email", "oauth_platform"]
 
 
 class EmptySerializer(serializers.Serializer):
