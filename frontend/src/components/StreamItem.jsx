@@ -1,6 +1,7 @@
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import DetailModal from './common/DetailModal';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const StreamItem = ({ stream }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +47,7 @@ const StreamItem = ({ stream }) => {
                 </div>
                 <div
                     id='card__container'
-                    className='group/edit absolute top-0 left-0 w-full h-full flex flex-col justify-between backdrop-brightness-90 opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 ease-in-out'>
+                    className='group/edit absolute top-0 left-0 w-full h-full flex flex-col justify-between backdrop-brightness-75 opacity-0 group-hover/item:opacity-100 transition-opacity duration-500 ease-in-out'>
                     <div id='card__live' className='flex flex-row justify-between items-center p-2'>
                         <div className='w-3 h-3 lg:w-4 lg:h-4 2xl:w-2 2xl:h-2 bg-[#F33232] rounded-full ml-1 animate-ping-slow'></div>
                         <div className='px-1 bg-black opacity-70 text-white rounded-md text-sm lg:text-base 2xl:text-xs'>
@@ -68,17 +69,19 @@ const StreamItem = ({ stream }) => {
             <div
                 id='card__info'
                 className='flex gap-2 lg:gap-3 w-full my-1 2xl:w-4/6 2xl:flex-col 2xl:gap-0 2xl:my-0'>
-                <div className='max-w-7 max-h-7 lg:max-w-9 lg:max-h-9'>
+                <div className='min-w-7 min-h-7 lg:min-w-9 lg:min-h-9 2xl:hidden'>
                     <img
                         src={stream.channel_profile_image}
                         alt={stream.channel_name}
-                        className='w-full h-full rounded-full mt-1.5 ml-0.5 2xl:hidden'
+                        className='w-7 h-7 lg:w-9 lg:h-9 rounded-full mt-1.5 ml-0.5 2xl:hidden'
                     />
                 </div>
                 <div className='flex flex-col flex-grow overflow-hidden'>
-                    <div className='truncate py-1 font-semibold text-base lg:text-lg dark:text-[#f5f7fa]'>
+                    <Link
+                        to={stream.streaming_link}
+                        className='truncate py-1 font-semibold text-base lg:text-lg dark:text-[#f5f7fa] hover:opacity-65 dark:hover:opacity-80'>
                         {stream.title}
-                    </div>
+                    </Link>
                     <div className='text-xs lg:text-sm text-slate-600 dark:text-[#c3cfe2]'>
                         {stream.channel_name}
                     </div>

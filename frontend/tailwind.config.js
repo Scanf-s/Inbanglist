@@ -7,12 +7,26 @@ export default {
             margin: 0,
         },
         extend: {
+            fontFamily: {
+                sans: ['Poppins', 'ui-sans-serif', 'system-ui'],
+            },
             animation: {
                 'ping-slow': 'ping 1.5s linear infinite',
                 'spin-slow': 'spin 2s linear infinite',
+                shimmer: 'shimmer 1.5s infinite linear',
             },
-            fontFamily: {
-                sans: ['Poppins', 'ui-sans-serif', 'system-ui'],
+            keyframes: {
+                shimmer: {
+                    '0%': { backgroundPosition: '-100%' },
+                    '100%': { backgroundPosition: '100%' },
+                },
+                ping: {
+                    '75%, 100%': { transform: 'scale(1.5)' },
+                },
+            },
+            backgroundImage: {
+                'gradient-custom':
+                    'linear-gradient(to right, #D9D9D9 0%, #EDEEF1 50%, #D9D9D9 100%)',
             },
         },
         important: true,
