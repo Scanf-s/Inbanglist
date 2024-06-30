@@ -40,8 +40,11 @@ async def youtube_crawling(page, soup):
     channel_name_list = [channel_name.text for text_container in soup.find_all("div", {"id": "text-container"}) for
                          channel_name in text_container.find_all('a')]
     live_viewers_list = [viewers.text for viewers in
-                         soup.find_all("span", class_="inline-metadata-item style-scope ytd-video-meta-block")]
+                         soup.find_all("span", class_="inline-metadata-item style-scope ytd-video-meta-block") if
+                         not search(r'조회수', viewers.text)]
+    
     channel_links = [link.get('href') for link in soup.find_all("a", id="avatar-link") if link.get('href')]
+    channel_profile_images = [img['src'] for img in soup.find_all("img", class_="style-scope yt-img-shadow") if img.get('src')]
 
     print("Links:", len(link_list))
     print("Thumbnails:", len(thumbnail_list))
@@ -49,15 +52,15 @@ async def youtube_crawling(page, soup):
     print("Channel Names:", len(channel_name_list))
     print("Live Viewers:", len(live_viewers_list))
     print("channel_link:", len(channel_links))
+    print("channel_profile_images:", len(channel_profile_images))
 
-    datas = [(thumb, link, channel_link, title, channel, viewers) for thumb, link, channel_link, title, channel, viewers in
-                     zip(thumbnail_list, link_list, channel_links, title_list, channel_name_list, live_viewers_list) if
-                     not search(r'Streamed \d+|조회수|스트리밍|분', viewers)]
-    
+    datas = [(thumb, link, channel_link, title, channel, viewers, channel_profile_image) for thumb, link, channel_link, title, channel, viewers, channel_profile_image in
+                     zip(thumbnail_list, link_list, channel_links, title_list, channel_name_list, live_viewers_list, channel_profile_images) if
+                     not search(r'Streamed \d+|스트리밍|분', viewers)]
     print(len(datas))
     
     live_data_list = []
-    for thumbnail, streaming_link, channel_link, title, channel_name, concurrent_viewers in datas:
+    for thumbnail, streaming_link, channel_link, title, channel_name, concurrent_viewers, channel_profile_image in datas:
         live_data_list.append({
             'channel_name': channel_name,
             'thumbnail': thumbnail,
@@ -67,9 +70,10 @@ async def youtube_crawling(page, soup):
             'streaming_link': "https://www.youtube.com" + streaming_link,
             'channel_link': "https://www.youtube.com" + channel_link,
             'channel_description': "",
-            'followers': 0,
+            'channel_followers': 0,
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'channel_profile_image': channel_profile_image
         })
 
     return live_data_list
