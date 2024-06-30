@@ -22,7 +22,7 @@ const LoginPage = () => {
         // 로그인 함수 호출
         await login(email, password, () => navigate('/'));
     };
-
+    
     useEffect(() => {
         if (showModal) {
             setTimeout(() => {

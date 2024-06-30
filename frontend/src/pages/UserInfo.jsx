@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 const UserInfo = () => {
     const user = useAuthStore((state) => state.user);
-<<<<<<< HEAD
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const deleteUser = useAuthStore((state) => state.deleteUser);
     const [password, setPassword] = useState('');
@@ -37,25 +36,6 @@ const UserInfo = () => {
 
     if (!user) return <p>회원정보를 불러오는 중...</p>;
 
-
-=======
-    const { deleteUser } = useAuthStore();
-    const [password, setPassword] = useState('');
-    const [isDeletion, setIsDeletion] = useState(false);
-    const navigate = useNavigate();
-
-    if (!user) return <p>회원정보를 불러오는중..</p>;
-    const handleDelete = (e) => {
-        e.preventDefault();
-
-        deleteUser(
-            user.email,
-            password,
-            navigate('/')
-        );
-    };
-
->>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
     const titleLayout = 'mt-10 mb-10 flex';
     const innerTitle = 'w-40';
 
@@ -71,7 +51,6 @@ const UserInfo = () => {
             </div>
             <hr />
             <div>
-<<<<<<< HEAD
                 <div className='flex flex-col items-center text-center'>
                     <p className='mb-5'>
                         {user.user_profile_image ? (
@@ -86,20 +65,10 @@ const UserInfo = () => {
                 <div className={titleLayout}>
                     <p className={innerTitle}>이름</p>
                     <p>{user.username ? user.username : '이름없음'}</p>
-=======
-                <div className={titleLayout}>
-                    <p className={innerTitle}>이름</p>
-                    <p>황두나</p>
-                    {/* <p>{user.name}</p> */}
->>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
                 </div>
                 <div className={titleLayout}>
                     <p className={innerTitle}>메일</p>
                     <p>{user?.email}</p>
-<<<<<<< HEAD
-=======
-                    {/* <p>{user.mail}</p> */}
->>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
                 </div>
                 <div className={titleLayout}>
                     <p className={innerTitle}>연동계정</p>
@@ -117,16 +86,11 @@ const UserInfo = () => {
                 </div>
             </div>
             <div>
-<<<<<<< HEAD
                 <button onClick={() => setIsDeletion(true)} className='text-red-500'>
                     회원탈퇴
                 </button>
             </div>
 
-=======
-                <button onClick={() => setIsDeletion(true)}>회원탈퇴</button>
-            </div>
->>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
             {isDeletion ? (
                 <div className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[400px] h-[200px] bg-slate-100 rounded-lg border border-1 solid border-black p-8'>
                     <h1 className='text-2xl text-red-600 mb-5'>계정을 삭제하시겠습니까?</h1>
@@ -139,11 +103,7 @@ const UserInfo = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         className='px-3 py-0.5 outline-none rounded-md bg-slate-300 w-[150px]'
                     />
-<<<<<<< HEAD
                     <button onClick={handleDeleteAccount} className='text-red-700 bg-slate-300 ml-5 rounded-md px-3 py-0.5'>
-=======
-                    <button onClick={handleDelete} className='text-red-700 bg-slate-300 ml-5 rounded-md px-3 py-0.5'>
->>>>>>> 730cb9b (회원정보 페이지 생성 및 라우터 설정)
                         계정 삭제
                     </button>
                     <button
