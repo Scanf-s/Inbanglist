@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import StreamItem from './StreamItem';
 import axios from '../api/axios';
+import LoadingSkeleton from './LoadingSkeleton';
 
 const StreamList = ({ platform }) => {
     const [streams, setStreams] = useState([]);
@@ -63,9 +64,11 @@ const StreamList = ({ platform }) => {
             <div
                 className='flex flex-col gap-6 max-h-[calc(100vh-157px)] scroll-smooth scroll_custom'
                 ref={ref}>
-                {streams?.map((stream) => (
-                    <StreamItem key={stream.id} stream={stream} />
-                ))}
+                {streams.length === 0 && isLoading
+                    ? Array.from({ length: perPage }).map((_, index) => (
+                          <LoadingSkeleton key={index} />
+                      ))
+                    : streams.map((stream) => <StreamItem key={stream.id} stream={stream} />)}
             </div>
         </div>
     );
