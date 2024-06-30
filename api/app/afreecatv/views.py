@@ -20,7 +20,7 @@ class AfreecaTvListAPI(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
-        logger.info("Called AfreecaTvListAPI")
+        logger.info("GET /api/v1/afreecatv")
         response = super().list(request, *args, **kwargs)
         logger.info(f"Response Status Code: {response.status_code}")
         return response

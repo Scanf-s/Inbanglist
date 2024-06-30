@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1
 
 # 로컬 파일 시스템의 requirements.txt 파일을 컨테이너로 복사
 COPY ./requirements.txt /tmp/requirements.txt
+COPY ./requirements.dev.txt /tmp/requirements.dev.txt
 COPY ./app /app
 
 # 작업 디렉토리를 /app으로 설정

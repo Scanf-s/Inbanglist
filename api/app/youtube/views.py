@@ -21,7 +21,7 @@ class YoutubeListAPI(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
-        logger.info("Called YoutubeListAPI")
+        logger.info("GET /api/v1/youtube")
         response = super().list(request, *args, **kwargs)
         logger.info(f"Response Status Code: {response.status_code}")
         return response
