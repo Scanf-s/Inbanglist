@@ -22,27 +22,30 @@
 
 ### 역할 분담
 
-- 양의종 : Backend, 기획
-  - 프로젝트 기획
-  - AWS 인프라 구성
-  - 개인 Docker 환경 구성 및 docker-compose 작성
-  - 기초 Data scraping 소스코드 개발
-  - Django Backend API 설계 및 구현
-  
-- 조규재 : Backend
-  - AWS 인프라 구성
-  - 개인 Docker 환경 구성
-  - Data scraping 소스코드 개발 및 개선
-  - Crontab을 사용한 주기적인 데이터 스크래핑
-  - AWS RDS에 스크래핑 데이터 전달
- 
-- 이희주 : Frontend
-  - ...
+- **양의종 : Backend**
+  - **AWS 인프라 구성**: 전반적인 프로젝트 클라우드 환경 설정
+  - **Docker 환경 구성**: Dockerfile 작성 및 Docker Compose 설정.
+  - **Data scraping 소스코드 개발**: 다양한 플랫폼에서 데이터를 스크래핑하는 코드 작성.
+  - **Django Backend API 설계 및 구현**: RESTful API 엔드포인트 설계 및 구현.
 
-- 황두나 : Frontend
-  - ...
+- **조규재 : Backend**
+  - **AWS 인프라 구성**: EC2, VPC peering 설정 및 관리.
+  - **Docker 환경 구성**: Docker 이미지 최적화 및 컨테이너 관리.
+  - **Data scraping 소스코드 개발 및 개선**: 스크래핑 코드 작성 및 성능 최적화.
+  - **Crontab을 사용한 주기적인 데이터 스크래핑**: cron 작업 설정 및 자동화.
+  - **AWS RDS에 스크래핑 데이터 전달**: 스크래핑한 데이터를 AWS RDS에 저장.
+
+- **이희주 : Frontend**
+  - **API 데이터 요청 코드 작성**: 더미 데이터를 사용한 초기 API 요청 코드 작성.
+  - **실제 API 요청 코드 작성**: 백엔드 API와의 통신을 통해 실제 데이터 요청 코드 작성 및 연동.
+
+- **황두나 : Frontend**
+  - **페이지 라우터 설정**: React Router를 사용하여 페이지 간 내비게이션 설정.
+  - **데이터 화면 배치**: 가공된 데이터를 화면에 배치하고 UI 컴포넌트 작성.
+
 
 ## 1. 개발 환경
+Docker
 
 - Django API
   - WSL2 Ubuntu
@@ -56,6 +59,15 @@
   - ...
 
 ## 2. 사용 기술
+- Docker
+- Javascript
+- Python
+- Django
+- React
+- Selenium
+- AWS EC2
+- AWS RDS
+- Crontab
 
 ### Frontend
 - React
@@ -94,7 +106,6 @@
 ```
 
 ## 5. 기능 소개
-
 
 
 ## 6. 추가....
