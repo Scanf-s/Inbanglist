@@ -53,6 +53,7 @@ CUSTOM_USER_APPS = [
     "chzzk.apps.ChzzkConfig",  # Chzzk app
     "users.apps.UsersConfig",  # Users app
     "core.apps.CoreConfig",  # Core app
+    "s3.apps.S3Config",  # S3 app
 ]
 
 LIBRARIES = [

@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/v1/chzzk/", include("chzzk.urls")),
     path("api/v1/youtube/", include("youtube.urls")),
     path("api/users/", include("users.urls")),
+    path("api/s3/", include("s3.urls")),
     path("api/v1/schema/", SpectacularAPIView.as_view(permission_classes=[IsAdminUser]), name="schema"),
     path(
         "api/v1/docs/",
@@ -20,7 +21,6 @@ urlpatterns = [
         name="swagger-ui",
     ),
     path("api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-    # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 

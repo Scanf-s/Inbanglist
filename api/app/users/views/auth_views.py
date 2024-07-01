@@ -27,7 +27,14 @@ from users.utils import confirm_email_token, generate_email_token, get_jwt_token
 logger = logging.getLogger(__name__)
 
 
-@extend_schema(tags=["User"])
+@extend_schema(
+    tags=["User"],
+    parameters=[
+        OpenApiParameter(name="username", description="nickname of the user", required=True, type=str),
+        OpenApiParameter(name="email", description="Email of the user", required=True, type=str),
+        OpenApiParameter(name="password", description="Password of the user", required=True, type=str),
+    ],
+)
 class UserRegisterAPI(generics.CreateAPIView):
     """
     사용자 회원가입 관련 API
@@ -51,14 +58,19 @@ class UserRegisterAPI(generics.CreateAPIView):
             return Response(
                 {
                     "message": "User created successfully and activation email sent",
-                    "user": UserRegisterSerializer(user).data,
                 },
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(tags=["User"])
+@extend_schema(
+    tags=["User"],
+    parameters=[
+        OpenApiParameter(name="email", description="Email of the user", required=True, type=str),
+        OpenApiParameter(name="password", description="Password of the user", required=True, type=str),
+    ],
+)
 class UserLoginAPI(generics.GenericAPIView):
     """
     사용자 로그인 API
@@ -91,11 +103,22 @@ class UserLoginAPI(generics.GenericAPIView):
         )
 
 
-@extend_schema(tags=["User"])
+@extend_schema(
+    tags=["User"],
+    parameters=[
+        OpenApiParameter(
+            name="Authorization",
+            description="Authorization access token",
+            required=True,
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.HEADER,
+        ),
+        OpenApiParameter(name="refresh_token", description="Refresh token of the user", required=True, type=str),
+    ],
+)
 class UserLogoutAPI(generics.GenericAPIView):
     """
     사용자 로그아웃 API 입니다.
-    Header에 반드시 Authorization : Bearer {access_token} 넣어주셔야 합니다
     """
 
     serializer_class = UserLogoutSerializer
@@ -125,7 +148,7 @@ class UserLogoutAPI(generics.GenericAPIView):
     parameters=[
         OpenApiParameter(
             name="Authorization",
-            description="Authorization token",
+            description="Authorization access token",
             required=True,
             type=OpenApiTypes.STR,
             location=OpenApiParameter.HEADER,
@@ -172,13 +195,23 @@ class UserDeleteAPI(generics.GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(tags=["User"])
+@extend_schema(
+    tags=["User"],
+    parameters=[
+        OpenApiParameter(
+            name="Authorization",
+            description="Authorization access token",
+            required=True,
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.HEADER,
+        ),
+    ],
+)
 class UserInfoAPI(generics.RetrieveAPIView):
     serializer_class = UserInfoSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = [
-        JWTAuthentication
-    ]  # JWTAuthentication가 요청 헤더에서 access_token을 자동으로 추출하고 유효성 검사
+    # JWTAuthentication가 요청 헤더에서 access_token을 자동으로 추출하고 유효성 검사
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
         user = self.request.user
@@ -189,7 +222,8 @@ class UserInfoAPI(generics.RetrieveAPIView):
                 "user": {
                     "username": serializer.data["username"],
                     "email": serializer.data["email"],
-                    "user_profile_image": "https://www.example.com",  # serializer.data.get("profile_image", None),
+                    "profile_image": serializer.data["profile_image"],
+                    "is_staff": serializer.data["is_staff"],
                     "oauth_platform": serializer.data.get("oauth_platform", None),
                 },
             },
@@ -216,6 +250,6 @@ class UserEmailActivationAPI(generics.GenericAPIView):
                 user.is_active = True
                 user.save()  # user's is_active status has changed False to True, save changes into the database
                 return redirect(f"{os.getenv('MAIN_DOMAIN')}/activate/{token}")
-            except:
+            except User.DoesNotExist:
                 return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         return Response({"message": "Invalid or Expired activation code"}, status=status.HTTP_400_BAD_REQUEST)
