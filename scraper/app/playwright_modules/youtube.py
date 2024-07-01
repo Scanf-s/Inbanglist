@@ -45,19 +45,22 @@ async def youtube_crawling(page, soup):
     
     channel_links = [link.get('href') for link in soup.find_all("a", id="avatar-link") if link.get('href')]
     channel_profile_images = [img['src'] for img in soup.find_all("img", class_="style-scope yt-img-shadow") if img.get('src')]
-
-    print("Links:", len(link_list))
-    print("Thumbnails:", len(thumbnail_list))
-    print("Titles:", len(title_list))
-    print("Channel Names:", len(channel_name_list))
-    print("Live Viewers:", len(live_viewers_list))
-    print("channel_link:", len(channel_links))
-    print("channel_profile_images:", len(channel_profile_images))
-
+    
     datas = [(thumb, link, channel_link, title, channel, viewers, channel_profile_image) for thumb, link, channel_link, title, channel, viewers, channel_profile_image in
                      zip(thumbnail_list, link_list, channel_links, title_list, channel_name_list, live_viewers_list, channel_profile_images) if
                      not search(r'Streamed \d+|스트리밍|분', viewers)]
-    print(len(datas))
+    
+    print(
+        "Youtube "
+        f"Links: {len(link_list)}, "
+        f"Thumbnails: {len(thumbnail_list)}, "
+        f"Titles: {len(title_list)}, "
+        f"Channel Names: {len(channel_name_list)}, "
+        f"Live Viewers: {len(live_viewers_list)}, "
+        f"Channel Links: {len(channel_links)}, "
+        f"Channel Profile Images: {len(channel_profile_images)} "
+        f"Total datas: {len(datas)} "
+    )
     
     live_data_list = []
     for thumbnail, streaming_link, channel_link, title, channel_name, concurrent_viewers, channel_profile_image in datas:

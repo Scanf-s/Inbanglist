@@ -24,6 +24,7 @@ async def main():
         results = await asyncio.gather(*tasks)
         results = [item for result_array in results for item in result_array]
         connector.insert(results)
+        print(time.strftime('%Y-%m-%d %H:%M:%S'))
         await browser.close()
 
 

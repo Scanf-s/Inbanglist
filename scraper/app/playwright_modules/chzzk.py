@@ -2,7 +2,7 @@ from datetime import datetime
 from convert_int import convert_to_int
 
 async def scroll(page):
-    no_of_pagedowns = 20
+    no_of_pagedowns = 14
     while no_of_pagedowns > 0:
         await page.keyboard.press("PageDown")
         no_of_pagedowns -= 1
@@ -21,10 +21,9 @@ async def chzzk_crawling(page, soup):
 
     html = await page.content()
     soup = soup(html, "html.parser")
-    for thumbnail, title, channel_name, live_viewer, channel_link, channel_profile_image in zip(
+    for thumbnail, title, live_viewer, channel_link, channel_profile_image in zip(
         soup.find_all("a", class_="video_card_thumbnail__QXYT8"),
         soup.find_all("a", class_="video_card_title__Amjk2"),
-        soup.find_all("span", class_="name_text__yQG50"),
         soup.find_all("span", class_="video_card_badge__w02UD"),
         soup.find_all("a", class_="video_card_channel__AjQ+P"),
         soup.find_all("a", class_="video_card_image__yHXqv")
@@ -37,9 +36,12 @@ async def chzzk_crawling(page, soup):
             thumbnails.append(img['src'])
         else:
             thumbnails.append("성인인증걸려있음")
+
         titles.append(title.text.strip("라이브 엔드로 이동"))
-        channel_names.append(channel_name.text.strip().strip('\n'))
         
+        channel_name = channel_link.find("span", class_="name_text__yQG50").text
+        channel_names.append(channel_name)
+
         live_viewers.append(live_viewer.text.strip())
 
         if channel_link.get('href'):
@@ -50,14 +52,16 @@ async def chzzk_crawling(page, soup):
         if 'src' in profile_image.attrs:
             channel_profile_images.append(profile_image['src'])
     
-    print("chzzk")
-    print("Links:", len(links))
-    print("Thumbnails:", len(thumbnails))
-    print("Titles:", len(titles))
-    print("Channel Names:", len(channel_names))
-    print("Live Viewers:", len(live_viewers))
-    print("Channel Links:", len(channel_links))
-    print("channel_profile_images:", len(channel_profile_images))
+    print(
+        "CHZZK"
+        f"Links: {len(links)}, "
+        f"Thumbnails: {len(thumbnails)}, "
+        f"Titles: {len(titles)}, "
+        f"Channel Names: {len(channel_names)}, "
+        f"Live Viewers: {len(live_viewers)}, "
+        f"Channel Links: {len(channel_links)}, "
+        f"Channel Profile Images: {len(channel_profile_images)}"
+    )
 
     datas = zip(thumbnails, links, titles, channel_names, live_viewers, channel_links, channel_profile_images)
 
