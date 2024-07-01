@@ -1,9 +1,12 @@
 # 라이브 스트리밍 리스트 프로젝트
 
+![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
+
 ## 프로젝트 소개
 
-라이브 스트리밍 리스트 프로젝트는 다양한 플랫폼에서 실시간 스트리밍 데이터를 수집하고 이를 사용자에게 제공하는 웹 애플리케이션입니다. 
-이 프로젝트는 백엔드에서 데이터를 스크래핑하여 데이터베이스에 저장하고, 프론트엔드는 저장된 데이터를 기반으로 사용자에게 실시간 스트리밍 정보를 제공합니다.
+`라이브 스트리밍 리스트` 프로젝트는 다양한 실시간 방송 플랫폼에서 실시간 스트리밍 데이터를 수집하고 이를 사용자에게 제공하는 웹 애플리케이션입니다.
+현재 구현된 내용은 실시간 방송 플랫폼으로부터 데이터를 수집하여, 시청자 순으로 데이터를 제공하는 기능만 구현되어 있습니다.
+추후 태그, 관심도에 따른 실시간 방송 리스트를 보여주는 기능을 추가할 예정입니다.
 
 ## 팀원 구성
 
@@ -20,9 +23,10 @@
 ### 역할 분담
 
 - 양의종 : Backend, 기획
+  - 프로젝트 기획
   - AWS 인프라 구성
   - 개인 Docker 환경 구성 및 docker-compose 작성
-  - Data scraping 소스코드 개발
+  - 기초 Data scraping 소스코드 개발
   - Django Backend API 설계 및 구현
   
 - 조규재 : Backend
@@ -33,28 +37,64 @@
   - AWS RDS에 스크래핑 데이터 전달
  
 - 이희주 : Frontend
+  - ...
 
 - 황두나 : Frontend
-
+  - ...
 
 ## 1. 개발 환경
-Docker
+
+- Django API
+  - WSL2 Ubuntu
+  - Docker python:3.12-alpine3.20
+
+- Data scraper
+  - MacOS
+  - Docker python:3.12-slim
+ 
+- Frontend
+  - ...
 
 ## 2. 사용 기술
-- Docker
-- Javascript
-- Python
-- Django
+
+### Frontend
 - React
+
+### Backend
+- Django
+- BeautifulSoup4
+- Playwright
 - Selenium
-- AWS EC2
-- AWS RDS
 - Crontab
+
+### Database
+- AWS RDS Postgres
+
+### CI/CD
+- Docker
+- Github Actions
+
+### Cloud
+- AWS Route53
+- AWS CloudFront
+- AWS ALB
+- AWS S3
+- AWS EC2
+- AWS ACM
+
 
 ## 3. 브랜치 전략
 
+사진 첨부 해야함
+
 ## 4. 프로젝트 구조
 
+```yml
+
+```
+
 ## 5. 기능 소개
+
+
 
 ## 6. 추가....
