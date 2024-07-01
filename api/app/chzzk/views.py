@@ -1,3 +1,5 @@
+import logging
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -5,6 +7,8 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from chzzk.pagination import ChzzkPagination
 from chzzk.serializers import ChzzkDataSerializer
 from common.models import CommonModel
+
+logger = logging.getLogger(__name__)
 
 
 # 참고 링크
@@ -15,6 +19,12 @@ class ChzzkListAPI(generics.ListAPIView):
     serializer_class = ChzzkDataSerializer
     pagination_class = ChzzkPagination
     permission_classes = [AllowAny]
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET /api/v1/chzzk")
+        response = super().list(request, *args, **kwargs)
+        logger.info(f"Response Status Code: {response.status_code}")
+        return response
 
 
 @extend_schema(tags=["Chzzk"])
