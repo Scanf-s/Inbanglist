@@ -224,7 +224,7 @@ class UserInfoAPI(generics.RetrieveAPIView):
                     "email": serializer.data["email"],
                     "profile_image": serializer.data["profile_image"],
                     "is_staff": serializer.data["is_staff"],
-                    "oauth_platform": serializer.data.get("oauth_platform", None)
+                    "oauth_platform": serializer.data.get("oauth_platform", None),
                 },
             },
             status=status.HTTP_200_OK,

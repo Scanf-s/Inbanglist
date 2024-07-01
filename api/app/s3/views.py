@@ -1,14 +1,16 @@
 import os
+import random
+import string
 
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema
-from users.models import User
-from s3.serializers import UploadProfileImageSerializer
+
 from s3.S3Instance import S3Instance
-import random
-import string
+from s3.serializers import UploadProfileImageSerializer
+from users.models import User
+
 
 @extend_schema(
     tags=["S3"],
@@ -31,10 +33,7 @@ import string
     12. 업로드 과정에서 예외가 발생하면 오류 메시지와 상태 코드 400을 반환합니다.
     """,
     request={"multipart/form-data": UploadProfileImageSerializer},
-    responses={
-        200: UploadProfileImageSerializer,
-        400: "파일이 제공되지 않음 또는 업로드 과정에서 오류 발생"
-    }
+    responses={200: UploadProfileImageSerializer, 400: "파일이 제공되지 않음 또는 업로드 과정에서 오류 발생"},
 )
 class UploadProfileImageView(generics.UpdateAPIView):
     queryset = User.objects.all()
@@ -73,14 +72,14 @@ class UploadProfileImageView(generics.UpdateAPIView):
         """
 
         user = self.request.user
-        if 'profile_image' not in request.FILES:
+        if "profile_image" not in request.FILES:
             return Response({"error": "No file provided"}, status=400)
         file = request.FILES["profile_image"]
         s3_client = S3Instance().get_s3_instance()
-        random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+        random_string = "".join(random.choices(string.ascii_letters + string.digits, k=16))
         profile_image_name = f"profile_images/{user.id}/{random_string}.png"
 
-        if user.profile_image:         # 이전 프로필 이미지 삭제
+        if user.profile_image:  # 이전 프로필 이미지 삭제
             old_image_key = user.profile_image.split(f"https://{os.getenv('AWS_S3_BUCKET_NAME')}.s3.amazonaws.com/")[-1]
             try:
                 s3_client.delete_object(Bucket=os.getenv("AWS_S3_BUCKET_NAME"), Key=old_image_key)

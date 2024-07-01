@@ -91,6 +91,7 @@ class UserNaverLoginAPI(generics.GenericAPIView):
     """
     Just call this API to log in with Naver
     """
+
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 
@@ -224,6 +225,7 @@ class UserGoogleLoginAPI(generics.GenericAPIView):
     """
     Just call this API to log in with Google
     """
+
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 

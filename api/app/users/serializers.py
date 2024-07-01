@@ -4,8 +4,10 @@ from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
 from s3.S3Instance import S3Instance
+
+from .models import User
+
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     # 비밀번호 필드를 추가하고, 이 필드를 write_only로 설정하여 응답에 포함되지 않도록 설정

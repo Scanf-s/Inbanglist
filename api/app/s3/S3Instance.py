@@ -1,10 +1,10 @@
 from __future__ import annotations
-import os
-import boto3
+
 import logging
+import os
 from dataclasses import dataclass
 
-from botocore.exceptions import NoCredentialsError
+import boto3
 
 logger = logging.getLogger("django.request")
 
@@ -46,8 +46,8 @@ class S3Instance:
         :rtype: boto3.client
         """
         return boto3.client(
-            's3',
+            "s3",
             aws_access_key_id=self.aws_access_key_id,
             aws_secret_access_key=self.aws_secret_access_key,
-            region_name=self.aws_region_name
+            region_name=self.aws_region_name,
         )
