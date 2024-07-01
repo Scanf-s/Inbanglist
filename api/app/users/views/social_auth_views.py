@@ -88,6 +88,9 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
 
 @extend_schema(tags=["User/OAuth2"])
 class UserNaverLoginAPI(generics.GenericAPIView):
+    """
+    Just call this API to log in with Naver
+    """
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 
@@ -218,6 +221,9 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
 
 @extend_schema(tags=["User/OAuth2"])
 class UserGoogleLoginAPI(generics.GenericAPIView):
+    """
+    Just call this API to log in with Google
+    """
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 

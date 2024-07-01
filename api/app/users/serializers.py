@@ -1,9 +1,11 @@
+import os
+
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-
+from s3.S3Instance import S3Instance
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     # 비밀번호 필드를 추가하고, 이 필드를 write_only로 설정하여 응답에 포함되지 않도록 설정
@@ -23,6 +25,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             email=validated_data["email"],
             password=validated_data["password"],
             oauth_platform="none",
+            profile_image=os.getenv("DEFAULT_PROFILE_IMAGE"),
             is_active=False,  # 이메일 인증을 하기 이전이므로 False로 설정
         )
         return user
@@ -157,8 +160,7 @@ class UserSocialAccountDeleteSerializer(serializers.Serializer):
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # fields = ["username", "email", "profile_image", "oauth_platform"]
-        fields = ["username", "email", "oauth_platform"]
+        fields = ["username", "email", "profile_image", "oauth_platform", "is_staff"]
 
 
 class EmptySerializer(serializers.Serializer):
