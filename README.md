@@ -59,40 +59,38 @@ Docker
   - ...
 
 ## 2. 사용 기술
-- Docker
-- Javascript
-- Python
-- Django
-- React
-- Selenium
-- AWS EC2
-- AWS RDS
-- Crontab
 
 ### Frontend
-- React
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 
 ### Backend
-- Django
-- BeautifulSoup4
-- Playwright
-- Selenium
-- Crontab
+#### API Server
+![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white)
+![DjangoREST](https://img.shields.io/badge/DJANGO-REST-ff1709?style=for-the-badge&logo=django&logoColor=white&color=ff1709&labelColor=gray)
+![Celery](https://img.shields.io/badge/celery-%23a9cc54.svg?style=for-the-badge&logo=celery&logoColor=ddf4a4)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+
+#### Data Scraper
+![BeautifulSoup4](https://img.shields.io/badge/beautifulsoup4-4B8BBE?style=for-the-badge&logo=python&logoColor=white)
+![Playwright](https://img.shields.io/badge/playwright-2E2E2E?style=for-the-badge&logo=microsoft-edge&logoColor=white)
+![Selenium](https://img.shields.io/badge/-selenium-%43B02A?style=for-the-badge&logo=selenium&logoColor=white)
+![Crontab](https://img.shields.io/badge/crontab-23A97A?style=for-the-badge&logo=linux&logoColor=white)
 
 ### Database
-- AWS RDS Postgres
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![AWS RDS](https://img.shields.io/badge/amazonrds-%23527FFF.svg?style=for-the-badge&logo=amazon-rds&logoColor=white)
 
 ### CI/CD
-- Docker
-- Github Actions
+![Docker](https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/githubactions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
 ### Cloud
-- AWS Route53
-- AWS CloudFront
-- AWS ALB
-- AWS S3
-- AWS EC2
-- AWS ACM
+![AWS Route53](https://img.shields.io/badge/aws-route53-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![AWS CloudFront](https://img.shields.io/badge/aws-cloudfront-F2B400?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![AWS ALB](https://img.shields.io/badge/aws-alb-FF4F8B?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![AWS S3](https://img.shields.io/badge/aws-s3-569A31?style=for-the-badge&logo=amazon-s3&logoColor=white)
+![AWS EC2](https://img.shields.io/badge/aws-ec2-FF9900?style=for-the-badge&logo=amazon-ec2&logoColor=white)
+![AWS ACM](https://img.shields.io/badge/aws-acm-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
 
 ## 3. 브랜치 전략
@@ -102,10 +100,17 @@ Docker
 ## 4. 프로젝트 구조
 
 ```yml
-
+main branch로 합친 뒤, 해당 프로젝트의 프로젝트 구조를 넣을 예정입니다.
 ```
 
 ## 5. 기능 소개
 
 
-## 6. 추가....
+## 6. 어플리케이션 아키텍쳐
+
+사진 첨부 해야함
+
+## 7. ERD
+
+사진 첨부 해야함
+
