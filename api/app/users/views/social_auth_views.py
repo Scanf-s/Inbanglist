@@ -211,13 +211,9 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
         # JWT 토큰 생성
         tokens = get_jwt_tokens_for_user(user)
 
-        return Response(
-            {
-                "message": "Login successful",
-                "jwt_tokens": tokens,
-            },
-            status=status.HTTP_200_OK,
-        )
+        # 프론트엔드 URL로 리다이렉션
+        redirect_url = f"{os.getenv('MAIN_DOMAIN')}/login?access_token={tokens['access']}&refresh_token={tokens['refresh']}"
+        return redirect(redirect_url)
 
 
 @extend_schema(tags=["User/OAuth2"])
@@ -332,10 +328,6 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
         # JWT 토큰 생성
         tokens = get_jwt_tokens_for_user(user)
 
-        return Response(
-            {
-                "message": "Login successful",
-                "jwt_tokens": tokens,
-            },
-            status=status.HTTP_200_OK,
-        )
+        # 프론트엔드 URL로 리다이렉션
+        redirect_url = f"{os.getenv('MAIN_DOMAIN')}/login?access_token={tokens['access']}&refresh_token={tokens['refresh']}"
+        return redirect(redirect_url)
