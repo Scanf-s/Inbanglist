@@ -134,6 +134,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+# COOKIE
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ["https://www.inbanglist.com"]
+
 # 프로젝트의 루트 URL 설정 파일
 ROOT_URLCONF = "config.urls"
 
