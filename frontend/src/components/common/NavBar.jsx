@@ -18,10 +18,11 @@ const NavBar = () => {
             <div className='flex items-center gap-1 md:gap-2'>
                 {isAuthenticated ? (
                     <div className='text-center cursor-pointer tracking-wide dark:text-[#f5f7fa] text-black'>
-                        <button to='/api/v1/docs' className='inline-block mr-3 underline' onClick={navigateToAdminDocs}>
-                            Admin Docs
-                        </button>
-
+                        {user?.is_staff ? (
+                            <button to='/api/v1/docs' className='inline-block mr-3 underline' onClick={navigateToAdminDocs}>
+                                Admin Docs
+                            </button>
+                        ) : null}
                         <Link to='/user' className='inline-block mr-3'>
                             회원 정보
                         </Link>
