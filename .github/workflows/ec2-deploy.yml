@@ -18,6 +18,10 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.REMOTE_EC2_PRIVATE_KEY }}
 
+    - name: Create temp directory
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_EC2_USER }}@${{ secrets.REMOTE_EC2_IP }} "mkdir -p ~/temp"
+
     - name: Copy files via rsync
       run: |
         rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ ${{ secrets.REMOTE_EC2_USER }}@${{ secrets.REMOTE_EC2_IP }}:~/temp
@@ -25,14 +29,18 @@ jobs:
     - name: Execute remote commands
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_EC2_USER }}@${{ secrets.REMOTE_EC2_IP }} << 'EOF'
-          cd ~/live_streaming_lists
-          docker-compose -f docker-compose-deploy.yml down
           cd ~
+          # 백업 및 이전 버전 저장
           mkdir -p old_version
           cp -r live_streaming_lists/ old_version/
+
+          # 새로운 파일 복사 및 설치
           rm -rf live_streaming_lists
-          git clone -b backend git@github.com:Scanf-s/live_streaming_lists.git
+          mv ~/temp live_streaming_lists
           cp ~/.env/.env ~/live_streaming_lists/
+
+          # Docker Compose로 애플리케이션 배포
           cd ~/live_streaming_lists
+          docker-compose -f docker-compose-deploy.yml down
           docker-compose -f docker-compose-deploy.yml up --build -d
         EOF
