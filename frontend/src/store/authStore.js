@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { authActions } from './authActions';
+import { authSelectors } from './authSelectors';
 
 const initialState = {
     user: null,
@@ -19,6 +20,7 @@ const useAuthStore = create(
             persist(
                 (set, get) => ({
                     ...initialState,
+                    ...authSelectors(set),
                     ...authActions(set, get),
                 }),
                 {

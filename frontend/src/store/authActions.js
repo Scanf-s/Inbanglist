@@ -77,14 +77,18 @@ export const authActions = (set, get) => ({
             };
             try {
                 const response = await makeDeleteRequest(access);
-                get().clearError();
+                set((state) => {
+                    state.clearTokens();
+                    state.clearError();
+                });
                 console.log('Successful deletion account:', response);
                 onSuccess();
             } catch (error) {
                 if (error.response && error.response.data && error.response.data.code === 'token_not_valid') {
                     // 토큰이 유효하지 않거나 만료된 경우
                     console.log('Access token is invalid or expired. Refreshing token...');
-                    access = await get().refreshAccessToken();
+                    const newAccess = await get().refreshAccessToken();
+                    get().saveTokens(newAccess, refresh);
                     // 재발급 받은 토큰으로 다시 시도
                     const response = await makeDeleteRequest(access);
                     set((state) => {
@@ -126,26 +130,6 @@ export const authActions = (set, get) => ({
             get().setError(errorMessage);
         }
     },
-    // login: async (email, password, onSuccess) => {
-    //     try {
-    //         const response = await axios.post(
-    //             '/api/users/login',
-    //             new URLSearchParams({
-    //                 username: email,
-    //                 password: password,
-    //             }),
-    //             {
-    //                 headers: {
-    //                     'Content-Type': 'application/x-www-form-urlencoded', // Django 기본 로그인 폼 형식
-    //                 },
-    //                 withCredentials: true, // 쿠키 포함
-    //             },
-    //         );
-    //         onSuccess();
-    //     } catch (error) {
-    //         console.error('Error during login:', error);
-    //     }
-    // },
 
     signUp: async (name, email, password, onSuccess, onError) => {
         try {
@@ -168,19 +152,64 @@ export const authActions = (set, get) => ({
         }
     },
 
-    navigateToAdminDocs: () => {
-        const token = get().accessToken;
-        if (token) {
-            const url = '/api/v1/docs';
-            window.open(url, '_self', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-        } else {
-            console.error('Access token is missing.');
-        }
-    },
+    // TODO :: Admin API page 접근 권한 부여시 해당 코드 재작성 필요 - CSRF Cookie 저장기능 미완성
+    // navigateToAdminDocs: async (onSuccess) => {
+    //     const access = get().accessToken;
+
+    //     const adminAccessToken = async () => {
+    //         // 1. /api/v1/docs/로 GET 요청을 보내서 CSRF 토큰을 받음
+    //         const response = await axios.get('/api/v1/docs/', {
+    //             headers: {
+    //                 Authorization: `Bearer ${access}`,
+    //             },
+    //         });
+    //         console.log(response)
+
+    //         // 2. 응답에서 CSRF 토큰이 포함된 쿠키를 확인
+    //         const csrfToken = Cookies.get('csrftoken');
+
+    //         if (csrfToken) {
+    //             console.log('CSRF token found in cookies:', csrfToken);
+    //             // 3. 다음 요청에 CSRF 토큰을 사용하여 schema 페이지 요청
+    //             const response2 = await axios.get('/api/v1/schema/', {
+    //                 headers: {
+    //                     Authorization: `Bearer ${access}`,
+    //                     'X-CSRF-TOKEN': csrfToken,
+    //                 },
+    //             });
+    //             console.log('Go to admin page..docs', response);
+    //             console.log('Go to admin page..schema', response2);
+
+    //             // 응답으로 받은 HTML을 새 창에 표시
+    //             const docsWindow = window.open(response.request.responseURL, '_blank');
+    //             // const docsWindow = window.open('', '_blank');
+    //             // docsWindow.document.write(response.data);
+    //             const schemaWindow = window.open('', '_blank');
+    //             schemaWindow.document.write(response2.data);
+    //         } else {
+    //             console.error('CSRF token not found in cookies');
+    //         }
+
+    //         console.error('Error during login.');
+    //     };
+
+    //     try {
+    //         console.log('Attempting authentication to access admin Documents..');
+    //         await adminAccessToken();
+    //     } catch (error) {
+    //         if (error.response && error.response.data && error.response.data.code === 'token_not_valid') {
+    //             // 토큰이 유효하지 않거나 만료된 경우
+    //             console.log('Access token is invalid or expired. Refreshing token...');
+    //             await get().refreshAccessToken();
+    //             // 재발급 받은 토큰으로 다시 시도
+    //             console.log('Attempting authentication to access admin Documents..');
+
+    //             await adminAccessToken();
+    //         } 
+    //         console.log('Administrator authentication failed: ', error);
+    //     }
+    // },
+
     refreshAccessToken: async () => {
         const refresh = get().refreshToken;
         try {
@@ -209,9 +238,18 @@ export const authActions = (set, get) => ({
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
-            get().setUser(response.data.user);
+            set((state) => {
+                state.user = response.data.user;
+            });
             console.log('Fetched user data successful:', response);
         } catch (error) {
+            if (error.response.code === 'token_not_valid') {
+                get().refreshAccessToken();
+                set((state) => {
+                    state.user = response.data.user;
+                });
+                console.log('Fetched user data successful:', response);
+            }
             console.error('Fetch user error:', error);
             set((state) => state.setError('사용자의 정보를 불러오지 못했습니다.'));
         }
@@ -237,3 +275,19 @@ export const authActions = (set, get) => ({
         }
     },
 });
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].replace(' ', '');
+            //var cookie = jQuery.trim(cookies[i]); 당신이 만약 jQuery를 사용한다면, 위 코드 대신 이 코드를 사용하여도 좋다
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
