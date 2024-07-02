@@ -59,6 +59,7 @@ class AfreecaTvListAPI(generics.ListAPIView):
     """
     API endpoint to retrieve a list of AfreecaTV streams sorted by the number of concurrent viewers.
     """
+
     queryset = CommonModel.objects.filter(platform="afreecatv").order_by("-concurrent_viewers")
     serializer_class = AfreecaTvDataSerializer
     pagination_class = AfreecaTVPagination
@@ -139,6 +140,7 @@ class AfreecaTvRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     API endpoint to retrieve, update, or delete a specific AfreecaTV stream.
     Only admin users are allowed to update or delete streams.
     """
+
     queryset = CommonModel.objects.filter(platform="afreecatv")
     serializer_class = AfreecaTvDataSerializer
     permission_classes = [IsAdminUser]

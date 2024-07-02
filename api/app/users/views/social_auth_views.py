@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import os
 import logging
-import requests
+import os
 
+import requests
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -82,8 +82,9 @@ logger = logging.getLogger(__name__)
             location=OpenApiParameter.HEADER,
         ),
         OpenApiParameter(name="email", description="Email of the user", required=True, type=OpenApiTypes.STR),
-        OpenApiParameter(name="refresh_token", description="Refresh token of the user", required=True,
-                         type=OpenApiTypes.STR),
+        OpenApiParameter(
+            name="refresh_token", description="Refresh token of the user", required=True, type=OpenApiTypes.STR
+        ),
         OpenApiParameter(
             name="oauth_platform",
             description="OAuth platform (e.g., google, naver) none : email signed up user",
@@ -136,7 +137,7 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
             except User.DoesNotExist:
                 logger.error(f"User not found: {email}")
                 return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-            except TokenError:
+            except TokenError as e:
                 logger.error(f"Token error: {str(e)}")
                 return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -259,6 +260,7 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
     """
     This API endpoint processes the Naver OAuth2 login callback.
     """
+
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 

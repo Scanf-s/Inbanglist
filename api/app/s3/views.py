@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import random
 import string
 
@@ -13,6 +13,7 @@ from s3.serializers import UploadProfileImageSerializer
 from users.models import User
 
 logger = logging.getLogger(__name__)
+
 
 @extend_schema(
     tags=["S3"],

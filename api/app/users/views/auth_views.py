@@ -247,8 +247,9 @@ class UserLoginAPI(generics.GenericAPIView):
             type=OpenApiTypes.STR,
             location=OpenApiParameter.HEADER,
         ),
-        OpenApiParameter(name="refresh_token", description="Refresh token of the user", required=True,
-                         type=OpenApiTypes.STR),
+        OpenApiParameter(
+            name="refresh_token", description="Refresh token of the user", required=True, type=OpenApiTypes.STR
+        ),
     ],
 )
 class UserLogoutAPI(generics.GenericAPIView):
@@ -343,8 +344,9 @@ class UserLogoutAPI(generics.GenericAPIView):
         ),
         OpenApiParameter(name="email", description="Email of the user", required=True, type=OpenApiTypes.STR),
         OpenApiParameter(name="password", description="Password of the user", required=True, type=OpenApiTypes.STR),
-        OpenApiParameter(name="refresh_token", description="Refresh token of the user", required=True,
-                         type=OpenApiTypes.STR),
+        OpenApiParameter(
+            name="refresh_token", description="Refresh token of the user", required=True, type=OpenApiTypes.STR
+        ),
     ],
 )
 class UserDeleteAPI(generics.GenericAPIView):

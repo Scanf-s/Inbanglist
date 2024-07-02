@@ -58,6 +58,7 @@ class ChzzkListAPI(generics.ListAPIView):
     """
     API endpoint to retrieve a list of Chzzk streams sorted by the number of concurrent viewers.
     """
+
     queryset = CommonModel.objects.filter(platform="chzzk").order_by("-concurrent_viewers")
     serializer_class = ChzzkDataSerializer
     pagination_class = ChzzkPagination
