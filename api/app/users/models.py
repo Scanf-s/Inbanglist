@@ -34,12 +34,18 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_social_user(self, email, oauth_platform, is_active, last_login, **extra_fields):
+    def create_social_user(self, email, username, is_active, last_login):
         if not email:
             raise ValueError("The Email field must be set")
 
         email = self.normalize_email(email)
-        user = self.model(email=email, oauth_platform=oauth_platform, is_active=is_active, last_login=last_login)
+        user = self.model(
+            email=email,
+            username=username,
+            profile_image=os.getenv("DEFAULT_PROFILE_IMAGE"),
+            is_active=is_active,
+            last_login=last_login
+        )
         user.save(using=self._db)
         return user
 
@@ -57,9 +63,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     )  # aws s3 url
     is_staff: BooleanField = models.BooleanField(default=False)
     is_active: BooleanField = models.BooleanField(default=False)
-    oauth_platform: CharField = models.CharField(
-        max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True
-    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -69,12 +72,9 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     def __str__(self):
         return self.email
 
-
-class NaverUserId(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    naver_user_id = models.CharField(max_length=255, null=True)
-
-
-class GoogleUserId(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    google_user_id = models.CharField(max_length=255, null=True)
+class UserOAuth2Platform(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    oauth_platform = models.CharField(
+        max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True
+    )
+    oauth2_user_id = models.CharField(max_length=255, null=True)
