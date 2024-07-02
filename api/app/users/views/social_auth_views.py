@@ -15,7 +15,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
-from users.models import GoogleUserId, NaverUserId, User
+from users.models import User, UserOAuth2Platform
 from users.serializers import EmptySerializer, UserSocialAccountDeleteSerializer
 from users.utils import get_jwt_tokens_for_user
 
@@ -103,7 +103,7 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    def delete(self, request, *args, **kwargs) -> Response:
+    def delete(self, request, *args, **kwargs):
         logger.info("DELETE /api/v1/users/social/delete")
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -111,11 +111,8 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
                 email = serializer.validated_data["email"]
                 refresh_token = serializer.validated_data["refresh_token"]
                 oauth_platform = serializer.validated_data["oauth_platform"]
-                user = User.objects.get(email=email, oauth_platform=oauth_platform)
-
-                if not user.is_active:
-                    logger.warning(f"Inactive user attempted to delete account: {email}")
-                    return Response({"message": "User is inactive"}, status=status.HTTP_400_BAD_REQUEST)
+                user_oauth = UserOAuth2Platform.objects.get(user__email=email, oauth_platform=oauth_platform)
+                user = user_oauth.user
 
                 # RefreshToken을 블랙리스트에 추가
                 try:
@@ -130,8 +127,13 @@ class UserSocialDeleteAPI(generics.GenericAPIView):
                 # 사용자가 소유한 모든 OutstandingToken 삭제
                 OutstandingToken.objects.filter(user=user).delete()
 
-                # 사용자 삭제
-                user.delete()
+                # 소셜 계정 정보 삭제
+                user_oauth.delete()
+
+                # 만약 사용자가 더 이상 다른 소셜 계정이 없고, 일반 계정도 없다면 사용자 삭제
+                if not UserOAuth2Platform.objects.filter(user=user).exists():
+                    user.delete()
+
                 logger.info(f"User {email} deleted successfully.")
                 return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
             except User.DoesNotExist:
@@ -264,7 +266,7 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
     serializer_class = EmptySerializer
     permission_classes = [AllowAny]
 
-    def get(self, request, *args, **kwargs) -> Response:
+    def get(self, request, *args, **kwargs):
         # https://developers.naver.com/docs/login/api/api.md
         logger.info("GET /api/v1/users/oauth2/naver/callback")
 
@@ -333,23 +335,30 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
 
         # 사용자 존재 여부 확인해서 새로운 사용자를 생성하거나 기존 사용자가 있다면, 로그인
         try:
-            user: User | None = User.objects.filter(email=user_email, oauth_platform="naver").first()
-            if not user:
-                user = User.objects.create_social_user(
-                    email=user_email,
-                    oauth_platform="naver",
-                    username=user_email.split("@")[0],
-                    last_login=timezone.now(),
-                    is_active=True,
-                )
-                logger.info(f"New user created: {user_email}")
-            else:
+            user_oauth2 = (
+                UserOAuth2Platform.objects.select_related("user")
+                .filter(user__email=user_email, oauth_platform="naver")
+                .first()
+            )
+
+            if user_oauth2:
+                # 이미 존재하는 사용자의 경우
+                user = user_oauth2.user
                 user.last_login = timezone.now()
                 user.is_active = True
                 user.save()
                 logger.info(f"Existing user logged in: {user_email}")
+            else:
+                # 새로운 사용자의 경우
+                user = User.objects.create_social_user(
+                    email=user_email,
+                    username=user_email.split("@")[0],
+                    last_login=timezone.now(),
+                    is_active=True,
+                )
+                UserOAuth2Platform.objects.create(user=user, oauth_platform="naver", oauth2_user_id=user_id)
+                logger.info(f"New user created: {user_email}")
 
-            NaverUserId.objects.update_or_create(user=user, defaults={"naver_user_id": user_id})
         except Exception as e:
             logger.error(f"Failed to get or create user: {str(e)}")
             return Response(
@@ -365,7 +374,9 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
         tokens = get_jwt_tokens_for_user(user)
 
         logger.info(f"User logged in successfully: {user_email}")
-        return redirect(f"{os.getenv('MAIN_DOMAIN')}/auth/callback?access_token={tokens['access']}&refresh_token={tokens['refresh']}")
+        return redirect(
+            f"{os.getenv('MAIN_DOMAIN')}/auth/callback?access_token={tokens['access']}&refresh_token={tokens['refresh']}"
+        )
 
 
 @extend_schema(
@@ -552,31 +563,40 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
             return Response({"message": "Failed to get user email and sub(id)"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.filter(email=user_email, oauth_platform="google").first()
-            if not user:
-                # 새로운 소셜계정 사용자라면
-                user = User.objects.create_social_user(
-                    email=user_email,
-                    oauth_platform="google",
-                    username=user_email.split("@")[0],
-                    is_active=True,
-                    last_login=timezone.now(),
-                )
-                logger.info(f"New user created: {user_email}")
-            else:
+            user_oauth2 = (
+                UserOAuth2Platform.objects.select_related("user")
+                .filter(user__email=user_email, oauth_platform="google")
+                .first()
+            )
+
+            if user_oauth2:
+                # 이미 존재하는 사용자의 경우
+                user = user_oauth2.user
                 user.last_login = timezone.now()
                 user.is_active = True
                 user.save()
                 logger.info(f"Existing user logged in: {user_email}")
+            else:
+                # 새로운 사용자의 경우
+                user = User.objects.create_social_user(
+                    email=user_email,
+                    username=user_email.split("@")[0],
+                    last_login=timezone.now(),
+                    is_active=True,
+                )
+                UserOAuth2Platform.objects.create(user=user, oauth_platform="google", oauth2_user_id=user_id)
+                logger.info(f"New user created: {user_email}")
 
-            GoogleUserId.objects.update_or_create(user=user, defaults={"google_user_id": user_id})
-            # Google 호출 시 전달받은 sub를 user_id 로 사용하여 따로 저장
         except Exception as e:
             logger.error(f"Failed to get or create user: {str(e)}")
-            return Response({"message": "Failed to get or create user"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            return Response(
+                {"message": "Failed to get or create user", "error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
         # JWT 토큰 생성
         tokens = get_jwt_tokens_for_user(user)
 
         logger.info(f"User logged in successfully: {user_email}")
-        return redirect(f"{os.getenv('MAIN_DOMAIN')}/auth/callback?access_token={tokens['access']}&refresh_token={tokens['refresh']}")
+        return redirect(
+            f"{os.getenv('MAIN_DOMAIN')}/auth/callback?access_token={tokens['access']}&refresh_token={tokens['refresh']}"
+        )

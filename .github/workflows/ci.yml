@@ -44,4 +44,4 @@ jobs:
       run: docker-compose run --rm api sh -c 'mypy --config-file /app/mypy.ini .'
 
     - name: Run Test Codes
-      run: docker-compose run --rm api sh -c 'python manage.py test youtube --no-input'
+      run: docker-compose run --rm api sh -c 'python manage.py test users --no-input'
