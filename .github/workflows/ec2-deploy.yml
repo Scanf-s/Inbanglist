@@ -13,22 +13,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Copy files via SSH
-      uses: appleboy/scp-action@v0.0.1
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
       with:
-        host: ${{ secrets.REMOTE_EC2_IP }}
-        username: ${{ secrets.REMOTE_EC2_USER }}
-        key: ${{ secrets.REMOTE_EC2_PRIVATE_KEY }}
-        source: "."
-        target: "~/temp"
+        ssh-private-key: ${{ secrets.REMOTE_EC2_PRIVATE_KEY }}
 
-    - name: Execute remote command via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.REMOTE_EC2_IP }}
-        username: ${{ secrets.REMOTE_EC2_USER }}
-        key: ${{ secrets.REMOTE_EC2_PRIVATE_KEY }}
-        script: |
+    - name: Copy files via rsync
+      run: |
+        rsync -avz -e "ssh -o StrictHostKeyChecking=no" ./ ${{ secrets.REMOTE_EC2_USER }}@${{ secrets.REMOTE_EC2_IP }}:~/temp
+
+    - name: Execute remote commands
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_EC2_USER }}@${{ secrets.REMOTE_EC2_IP }} << 'EOF'
           cd ~/live_streaming_lists
           docker-compose -f docker-compose-deploy.yml down
           cd ~
@@ -39,3 +35,4 @@ jobs:
           cp ~/.env/.env ~/live_streaming_lists/
           cd ~/live_streaming_lists
           docker-compose -f docker-compose-deploy.yml up --build -d
+        EOF
