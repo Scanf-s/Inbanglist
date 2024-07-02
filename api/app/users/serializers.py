@@ -1,10 +1,10 @@
 import os
 
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from django.shortcuts import get_object_or_404
 from .models import User, UserOAuth2Platform
 
 
@@ -18,10 +18,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         email = attrs.get("email")
 
         # 이메일이 소셜 계정으로 등록된 경우 확인
-        if UserOAuth2Platform.objects.filter(
-                user__email=email,
-                oauth_platform__in=['naver', 'google']
-        ).exists():
+        if UserOAuth2Platform.objects.filter(user__email=email, oauth_platform__in=["naver", "google"]).exists():
             raise serializers.ValidationError("Email is already registered with a social account")
 
         # 사용자명이 이미 존재하는지 확인
@@ -156,15 +153,15 @@ class UserSocialAccountDeleteSerializer(serializers.Serializer):
         refresh_token = attrs.get("refresh_token")
         oauth_platform = attrs.get("oauth_platform")
 
-        if not email or not refresh_token:
-            raise serializers.ValidationError("Email and refresh token are required")
+        if not email or not refresh_token or not oauth_platform:
+            raise serializers.ValidationError("Email, refresh token, and oauth platform are required")
 
         try:
-            User.objects.get(email=email, oauth_platform=oauth_platform)
+            user_oauth = UserOAuth2Platform.objects.get(user__email=email, oauth_platform=oauth_platform)
             RefreshToken(refresh_token)
         except TokenError:
             raise serializers.ValidationError("Invalid or expired refresh token")
-        except User.DoesNotExist:
+        except UserOAuth2Platform.DoesNotExist:
             raise serializers.ValidationError("User not found")
 
         return attrs

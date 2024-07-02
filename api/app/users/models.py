@@ -44,7 +44,7 @@ class UserManager(BaseUserManager):
             username=username,
             profile_image=os.getenv("DEFAULT_PROFILE_IMAGE"),
             is_active=is_active,
-            last_login=last_login
+            last_login=last_login,
         )
         user.save(using=self._db)
         return user
@@ -72,9 +72,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     def __str__(self):
         return self.email
 
+
 class UserOAuth2Platform(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    oauth_platform = models.CharField(
-        max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True
-    )
+    oauth_platform = models.CharField(max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True)
     oauth2_user_id = models.CharField(max_length=255, null=True)
