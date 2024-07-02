@@ -74,26 +74,21 @@ async def afreecatv_crawling(page, soup):
         if profile_img.get("src"):
             channel_profile_images.append(profile_img['src'])
 
-
-    print("Afreeca")
-    print("Links:", len(links))
-    print("Thumbnails:", len(thumbnails))
-    print("Titles:", len(titles))
-    print("Channel Names:", len(channel_names))
-    print("Live Viewers:", len(live_viewers))
-    print("Channel Links:", len(channel_links))
-    print("channel_profile_images:", len(channel_profile_images))
+    print(
+        "Afreeca "
+        f"Links: {len(links)}, "
+        f"Thumbnails: {len(thumbnails)}, "
+        f"Titles: {len(titles)}, "
+        f"Channel Names: {len(channel_names)}, "
+        f"Live Viewers: {len(live_viewers)}, "
+        f"Channel Links: {len(channel_links)}, "
+        f"Channel Profile Images: {len(channel_profile_images)}"
+    )
 
     datas = zip(thumbnails, links, titles, channel_names, live_viewers, channel_links, channel_profile_images)
 
     live_data_list = []
     for thumbnail, streaming_link, title, channel_name, concurrent_viewers, channel_link, channel_profile_image in datas:
-
-
-    datas = zip(thumbnails, links, titles, channel_names, live_viewers, channel_links)
-
-    live_data_list = []
-    for thumbnail, streaming_link, title, channel_name, concurrent_viewers, channel_link in datas:
         live_data_list.append({
             'channel_name': channel_name,
             'thumbnail': thumbnail,
@@ -107,7 +102,6 @@ async def afreecatv_crawling(page, soup):
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'channel_profile_image': channel_profile_image
-
         })
 
     return live_data_list
