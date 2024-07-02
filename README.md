@@ -36,8 +36,12 @@
   - **AWS RDS에 스크래핑 데이터 전달**: 스크래핑한 데이터를 AWS RDS에 저장.
 
 - **이희주 : Frontend**
-  - **API 데이터 요청 코드 작성**: 더미 데이터를 사용한 초기 API 요청 코드 작성.
-  - **실제 API 요청 코드 작성**: 백엔드 API와의 통신을 통해 실제 데이터 요청 코드 작성 및 연동.
+  - **MSW(Mock Service Worker)를 이용한 Mocking API 개발하기** : API 요청 기능을 테스트하고 화면을 구성
+  - **로그인/ 회원가입 페이지 생성 및 UI 디자인** : 로그인 및 회원가입 페이지를 생성하고 페이지 UI를 디자인
+  - **실제 API 요청 코드로 수정 및 무한 스크롤 기능 구현** : 기존 MSW 코드를 일부 수정하고 페이지네이션 기능 구현에 따른 무한스크롤 로직을 일부 수정
+  - **페이지 UI 개선 및 다크 모드 적용** : 실제 데이터를 받아봄에 따른 UI 개선 및 다크모드를 적용
+  - **GitHub Actions를 통한 S3에 파일 자동 업로드 설정** : GitHub Actions를 사용하여 프론트엔드 빌드 파일을 AWS S3에 자동 배포하는 CI/CD 설정
+  - **스켈레톤 로딩 적용** : 데이터 비동기 처리에 따른 스켈레톤 로딩 애니메이션 적용
 
 - **황두나 : Frontend**
   - **페이지 라우터 설정**: React Router를 사용하여 페이지 간 내비게이션 설정.
@@ -50,18 +54,23 @@ Docker
 - Django API
   - WSL2 Ubuntu
   - Docker python:3.12-alpine3.20
+  - Pycharm
 
 - Data scraper
   - MacOS
   - Docker python:3.12-slim
+  - VScode
  
 - Frontend
-  - ...
+  - MacOS
+  - VScode
 
 ## 2. 사용 기술
 
 ### Frontend
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![Tailwind](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Zustand](https://img.shields.io/badge/zustand-%23000000.svg?style=for-the-badge&logo=zustand&logoColor=white)
 
 ### Backend
 #### API Server
@@ -105,10 +114,9 @@ main branch로 합친 뒤, 해당 프로젝트의 프로젝트 구조를 넣을 
 
 ## 5. 기능 소개
 
-
 ## 6. 어플리케이션 아키텍쳐
 
-사진 첨부 해야함
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/868007f2-7db3-40de-8032-c924e506a736)
 
 ## 7. ERD
 
