@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import Modal from '../components/common/GlobalModal';
+import axios from '../api/axios';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ const LoginPage = () => {
         // 로그인 함수 호출
         await login(email, password, () => navigate('/'));
     };
-    
+
     useEffect(() => {
         if (showModal) {
             setTimeout(() => {
@@ -31,17 +32,21 @@ const LoginPage = () => {
         }
     }, [showModal, clearError]);
 
-    const handleNaverLogin = () => {
-        window.open('/api/users/oauth2/naver/login', '_blank', 'noopener,noreferrer,width=600,height=600');
+    const handleNaverLogin = (event) => {
+        event.preventDefault();
+        window.location.href = 'https://www.inbanglist.com/api/users/oauth2/naver/login';
     };
+    //window.open('/api/users/oauth2/naver/login','_blank','noopener,noreferrer,width=600,height=600');
 
-    const openGoogleLogin = () => {
-        const googleLoginUrl = '/api/users/oauth2/google/login';
-        window.open(googleLoginUrl, 'googleLogin', 'noopener,noreferrer,width=600,height=600');
+    const openGoogleLogin = (event) => {
+        event.preventDefault();
+        window.location.href = 'https://www.inbanglist.com/api/users/oauth2/google/login';
     };
+    //const googleLoginUrl = '/api/users/oauth2/google/login';
+    //window.open(googleLoginUrl, 'googleLogin', 'noopener,noreferrer,width=600,height=600');
 
     return (
-        <div className='h-screen w-screen bg-gradient-to-br from-[#f5f7fa] to-[#c3cfe2] dark:from-[#537895] dark:to-[#09203f]'>
+        <div className='h-screen w-screen bg-gradient-to-br from-[#b3b6bc] to-[#c3cfe2] dark:from-[#537895] dark:to-[#09203f]'>
             <div className='fixed h-full w-full'>
                 <div className='h-full flex justify-center items-center'>
                     <div className='flex flex-col gap-8 w-[calc(100%-40px)] max-w-[440px] p-[50px] bg-white dark:bg-[#09203f] border dark:border-[#09203f] rounded-xl shadow-md'>
@@ -78,14 +83,20 @@ const LoginPage = () => {
                                 onClick={openGoogleLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#166ae5] text-[#166ae5] hover:bg-[#e7f0fd]'
                                 type='submit'>
-                                <img className='w-[25px] absolute left-6' src='/Google__G__logo.svg.png' />
+                                <img
+                                    className='w-[25px] absolute left-6'
+                                    src='/Google__G__logo.svg.png'
+                                />
                                 구글 로그인
                             </button>
                             <button
                                 onClick={handleNaverLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#65A23F] text-[#65A23F] hover:bg-[#deecdd]'
                                 type='submit'>
-                                <img className='w-[25px] absolute left-6' src='/Naver_logo_initial.svg.png' />
+                                <img
+                                    className='w-[25px] absolute left-6'
+                                    src='/Naver_logo_initial.svg.png'
+                                />
                                 네이버 로그인
                             </button>
                         </form>
