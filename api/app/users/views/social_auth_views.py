@@ -27,6 +27,9 @@ logger = logging.getLogger(__name__)
     summary="Social account user deletion API",
     description="""
         This API endpoint allows a user to delete their social account.
+        ** 만약, 일반 이메일 계정에 소셜 로그인 계정으로 연동했다면,** 
+        ** 해당 API는 소셜 연동만 삭제 처리되므로, **
+        ** 이후 사용자 자체를 삭제하고 싶다면, Users의 delete method 사용 바랍니다. **
 
         ## Key Features:
         - **Authentication**: Requires a valid JWT access token.
@@ -349,15 +352,25 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
                 user.save()
                 logger.info(f"Existing user logged in: {user_email}")
             else:
-                # 새로운 사용자의 경우
-                user = User.objects.create_social_user(
-                    email=user_email,
-                    username=user_email.split("@")[0],
-                    last_login=timezone.now(),
-                    is_active=True,
-                )
-                UserOAuth2Platform.objects.create(user=user, oauth_platform="naver", oauth2_user_id=user_id)
-                logger.info(f"New user created: {user_email}")
+                # 사용자가 존재하지만 소셜 계정이 연결되지 않은 경우
+                user = User.objects.filter(email=user_email).first()
+                if user:
+                    # 기존 사용자에 소셜 계정 연결
+                    UserOAuth2Platform.objects.create(user=user, oauth_platform="naver", oauth2_user_id=user_id)
+                    user.last_login = timezone.now()
+                    user.is_active = True
+                    user.save()
+                    logger.info(f"Social account linked for existing user: {user_email}")
+                else:
+                    # 새로운 사용자의 경우
+                    user = User.objects.create_social_user(
+                        email=user_email,
+                        username=user_email.split("@")[0],
+                        last_login=timezone.now(),
+                        is_active=True,
+                    )
+                    UserOAuth2Platform.objects.create(user=user, oauth_platform="naver", oauth2_user_id=user_id)
+                    logger.info(f"New user created: {user_email}")
 
         except Exception as e:
             logger.error(f"Failed to get or create user: {str(e)}")
@@ -366,11 +379,6 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-        if user is None:
-            logger.error("User creation failed")
-            return Response({"message": "User creation failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # JWT 토큰 생성
         tokens = get_jwt_tokens_for_user(user)
 
         logger.info(f"User logged in successfully: {user_email}")
@@ -577,15 +585,25 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
                 user.save()
                 logger.info(f"Existing user logged in: {user_email}")
             else:
-                # 새로운 사용자의 경우
-                user = User.objects.create_social_user(
-                    email=user_email,
-                    username=user_email.split("@")[0],
-                    last_login=timezone.now(),
-                    is_active=True,
-                )
-                UserOAuth2Platform.objects.create(user=user, oauth_platform="google", oauth2_user_id=user_id)
-                logger.info(f"New user created: {user_email}")
+                # 사용자가 존재하지만 소셜 계정이 연결되지 않은 경우
+                user = User.objects.filter(email=user_email).first()
+                if user:
+                    # 기존 사용자에 소셜 계정 연결
+                    UserOAuth2Platform.objects.create(user=user, oauth_platform="google", oauth2_user_id=user_id)
+                    user.last_login = timezone.now()
+                    user.is_active = True
+                    user.save()
+                    logger.info(f"Social account linked for existing user: {user_email}")
+                else:
+                    # 새로운 사용자의 경우
+                    user = User.objects.create_social_user(
+                        email=user_email,
+                        username=user_email.split("@")[0],
+                        last_login=timezone.now(),
+                        is_active=True,
+                    )
+                    UserOAuth2Platform.objects.create(user=user, oauth_platform="google", oauth2_user_id=user_id)
+                    logger.info(f"New user created: {user_email}")
 
         except Exception as e:
             logger.error(f"Failed to get or create user: {str(e)}")
@@ -593,7 +611,7 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
                 {"message": "Failed to get or create user", "error": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        # JWT 토큰 생성
+
         tokens = get_jwt_tokens_for_user(user)
 
         logger.info(f"User logged in successfully: {user_email}")
