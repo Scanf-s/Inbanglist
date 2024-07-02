@@ -81,7 +81,11 @@ export const authActions = (set, get) => ({
                 console.log('Successful deletion account:', response);
                 onSuccess();
             } catch (error) {
-                if (error.response && error.response.data && error.response.data.code === 'token_not_valid') {
+                if (
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.code === 'token_not_valid'
+                ) {
                     // 토큰이 유효하지 않거나 만료된 경우
                     console.log('Access token is invalid or expired. Refreshing token...');
                     access = await get().refreshAccessToken();
