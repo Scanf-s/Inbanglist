@@ -365,14 +365,7 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
         tokens = get_jwt_tokens_for_user(user)
 
         logger.info(f"User logged in successfully: {user_email}")
-        return Response(
-            data={
-                "message": "User logged in successfully",
-                "access_token": tokens["access"],
-                "refresh_token": tokens["refresh"],
-            },
-            status=status.HTTP_200_OK,
-        )
+        return redirect(f"{os.getenv('MAIN_DOMAIN')}/auth/callback?access_token={tokens['access']}&refresh_token={tokens['refresh']}")
 
 
 @extend_schema(
@@ -566,6 +559,8 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
                     email=user_email,
                     oauth_platform="google",
                     username=user_email.split("@")[0],
+                    is_active=True,
+                    last_login=timezone.now(),
                 )
                 logger.info(f"New user created: {user_email}")
             else:
@@ -584,11 +579,4 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
         tokens = get_jwt_tokens_for_user(user)
 
         logger.info(f"User logged in successfully: {user_email}")
-        return Response(
-            data={
-                "message": "User logged in successfully",
-                "access_token": tokens["access"],
-                "refresh_token": tokens["refresh"],
-            },
-            status=status.HTTP_200_OK,
-        )
+        return redirect(f"{os.getenv('MAIN_DOMAIN')}/auth/callback?access_token={tokens['access']}&refresh_token={tokens['refresh']}")
