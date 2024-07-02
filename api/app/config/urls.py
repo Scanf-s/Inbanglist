@@ -14,10 +14,10 @@ urlpatterns = [
     path("api/v1/youtube/", include("youtube.urls")),
     path("api/users/", include("users.urls")),
     path("api/s3/", include("s3.urls")),
-    path("api/v1/schema/", SpectacularAPIView.as_view(permission_classes=[IsAdminUser]), name="schema"),
+    path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/v1/docs/",
-        SpectacularSwaggerView.as_view(url_name="schema", permission_classes=[IsAdminUser]),
+        SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
     path("api/v1/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),

@@ -34,12 +34,12 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_social_user(self, email, oauth_platform, **extra_fields):
+    def create_social_user(self, email, oauth_platform, is_active, last_login, **extra_fields):
         if not email:
             raise ValueError("The Email field must be set")
 
         email = self.normalize_email(email)
-        user = self.model(email=email, oauth_platform=oauth_platform)
+        user = self.model(email=email, oauth_platform=oauth_platform, is_active=is_active, last_login=last_login)
         user.save(using=self._db)
         return user
 
