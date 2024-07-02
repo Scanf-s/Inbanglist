@@ -1,0 +1,41 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Copy files via SSH
+      uses: appleboy/scp-action@v0.0.1
+      with:
+        host: ${{ secrets.REMOTE_EC2_IP }}
+        username: ${{ secrets.REMOTE_EC2_USER }}
+        key: ${{ secrets.REMOTE_EC2_PRIVATE_KEY }}
+        source: "."
+        target: "~/temp"
+
+    - name: Execute remote command via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_EC2_IP }}
+        username: ${{ secrets.REMOTE_EC2_USER }}
+        key: ${{ secrets.REMOTE_EC2_PRIVATE_KEY }}
+        script: |
+          cd ~/live_streaming_lists
+          docker-compose -f docker-compose-deploy.yml down
+          cd ~
+          mkdir -p old_version
+          cp -r live_streaming_lists/ old_version/
+          rm -rf live_streaming_lists
+          git clone -b backend git@github.com:Scanf-s/live_streaming_lists.git
+          cp ~/.env/.env ~/live_streaming_lists/
+          cd ~/live_streaming_lists
+          docker-compose -f docker-compose-deploy.yml up --build -d
