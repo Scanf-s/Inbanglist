@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useDarkModeStore } from '../../store/darkMode';
 import useAuthStore from '../../store/authStore';
+import { useEffect } from 'react';
 
 const NavBar = () => {
     const { toggleDarkMode } = useDarkModeStore();
@@ -8,6 +9,12 @@ const NavBar = () => {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const logout = useAuthStore((state) => state.logout);
     const navigateToAdminDocs = useAuthStore((state) => state.navigateToAdminDocs);
+    const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+    useEffect(() => {
+        initializeAuth()
+    }, [user, initializeAuth])
+    
 
     return (
         <div className='flex justify-between items-center dark:bg-slate-700 bg-[#c3cfe2] p-4 h-[68px]'>

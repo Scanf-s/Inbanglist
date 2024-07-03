@@ -36,27 +36,27 @@ const UserInfo = () => {
 
     if (!user) return <p>회원정보를 불러오는 중...</p>;
 
-    const titleLayout = 'mt-10 mb-10 flex';
-    const innerTitle = 'w-40';
+    const titleLayout = 'mt-10 mb-10 flex dark:text-white';
+    const innerTitle = 'w-40 dark:text-white';
 
     const linked = 'text-sm px-2 y-0.5 mr-3 ';
     const unLink = 'text-sm px-2 y-0.5 mr-3 text-slate-500';
-    const linkingBtn = 'text-sm px-2 y-0.5 bg-white border solid border-slate-500 rounded-md text-black';
-    const unlinkBtn = 'text-sm px-2 y-0.5 bg-white border solid border-slate-500 rounded-md text-slate-500';
+    const linkingBtn = 'text-sm px-2 y-0.5 bg-white dark:bg-slate-400 border solid border-slate-500 rounded-md text-black';
+    const unlinkBtn = 'text-sm px-2 y-0.5 bg-white dark:bg-slate-400 border solid border-slate-500 rounded-md text-slate-500';
 
     return (
         <div className='relative w-full h-[calc(100vh-68px)] p-8'>
             <div className='mb-5'>
-                <h1 className='text-2xl'>회원정보</h1>
+                <h1 className='text-2xl dark:text-white'>회원정보</h1>
             </div>
             <hr />
-            <div>
-                <div className='flex flex-col items-center text-center'>
-                    <p className='mb-5'>
+            <div >
+                <div className='flex flex-col items-center text-center my-10'>
+                    <p className='mb-5 w-[200px] h-[200px]'>
                         {user.user_profile_image ? (
-                            <img src='/logo_100.png' className='w-40 h-40 rounded-3xl' />
+                            <img src='/logo_100.png' className='w-full h-full rounded-full' />
                         ) : (
-                            <img src='/logo_100.png' />
+                            <img src='/logo_100.png' className='w-full h-full rounded-full' />
                         )}
                         {/* {user.user_profile_image ? <img src={user.user_profile_image} /> : <img src='/logo_100.png'/>} */}
                     </p>
@@ -79,8 +79,8 @@ const UserInfo = () => {
                             {/* {naverOauth ? <p className=''>naver</p> : <p>naver</p>} */}
                         </p>
                         <p className='mb-3'>
-                            <span className={linked}>google</span>
-                            <button className={unlinkBtn}>연동해제</button>
+                            <span className={unLink}>google</span>
+                            <button className={linkingBtn}>연동해제</button>
                         </p>
                     </div>
                 </div>

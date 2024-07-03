@@ -8,8 +8,13 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const login = useAuthStore((state) => state.login);
+    const error = useAuthStore((state) => state.error);
+    const setError = useAuthStore((state) => state.setError);
+    const showModal = useAuthStore((state) => state.showModal);
+    const clearError = useAuthStore((state) => state.clearError);
+
     // 로그인 버튼 클릭 이벤트 함수
-    const { login, error, setError, showModal, clearError } = useAuthStore();
     const handleLogin = async (e) => {
         e.preventDefault();
 
@@ -83,20 +88,14 @@ const LoginPage = () => {
                                 onClick={openGoogleLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#166ae5] text-[#166ae5] hover:bg-[#e7f0fd]'
                                 type='submit'>
-                                <img
-                                    className='w-[25px] absolute left-6'
-                                    src='/Google__G__logo.svg.png'
-                                />
+                                <img className='w-[25px] absolute left-6' src='/Google__G__logo.svg.png' />
                                 구글 로그인
                             </button>
                             <button
                                 onClick={handleNaverLogin}
                                 className='relative flex justify-center items-center gap-4 w-full h-12 pl-3 text-lg rounded-md border border-[#65A23F] text-[#65A23F] hover:bg-[#deecdd]'
                                 type='submit'>
-                                <img
-                                    className='w-[25px] absolute left-6'
-                                    src='/Naver_logo_initial.svg.png'
-                                />
+                                <img className='w-[25px] absolute left-6' src='/Naver_logo_initial.svg.png' />
                                 네이버 로그인
                             </button>
                         </form>
