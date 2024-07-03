@@ -129,9 +129,25 @@ export const authActions = (set, get) => ({
             });
             onSuccess();
         } catch (error) {
-            console.error('Login error:', error);
-            const errorMessage = '로그인에 실패하였습니다. 이메일과 비밀번호를 확인하세요.';
-            get().setError(errorMessage);
+            const loginFailError = error.response.data.errors.non_field_errors[0];
+            switch (loginFailError) {
+                case 'User is not active. Please check your email':
+                    get().setError('인증이 완료되지 않았습니다. 이메일을 확인하세요');
+                    console.log('User is not active. error:', error.data);
+                    break;
+                case 'Password does not match':
+                    get().setError('비밀번호가 일치하지 않습니다. 비밀번호를 확인하세요');
+                    console.log('User not found. error:', error.response.data);
+                    break;
+                case 'Email not found':
+                    get().setError('일치하는 회원정보가 없습니다. 이메일을 확인하세요.');
+                    console.log('User not found. error:', error.response.data);
+                    break;
+                default:
+                    get().setError('일치하는 회원정보가 없습니다. 이메일 또는 비밀번호를 확인하세요.');
+                    console.log('User not found. error:', error.response.data);
+                    break;
+            }
         }
     },
 
