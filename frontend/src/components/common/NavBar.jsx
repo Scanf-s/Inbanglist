@@ -9,12 +9,15 @@ const NavBar = () => {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const logout = useAuthStore((state) => state.logout);
     const navigateToAdminDocs = useAuthStore((state) => state.navigateToAdminDocs);
-    const initializeAuth = useAuthStore((state) => state.initializeAuth);
+    const fetchUser = useAuthStore((state) => state.fetchUser);
+    // const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
     useEffect(() => {
-        initializeAuth()
-    }, [user, initializeAuth])
-    
+        // initializeAuth()
+        if (!user) {
+            fetchUser();
+        }
+    }, [user]);
 
     return (
         <div className='flex justify-between items-center dark:bg-slate-700 bg-[#c3cfe2] p-4 h-[68px]'>
