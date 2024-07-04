@@ -173,7 +173,8 @@ export const authActions = (set, get) => ({
     },
 
     // TODO :: Admin API page 접근 권한 부여시 해당 코드 재작성 필요 - CSRF Cookie 저장기능 미완성
-    // navigateToAdminDocs: async (onSuccess) => {
+    navigateToAdminDocs: async () => {
+        window.location.href = "/api/v1/docs/";
     //     const access = get().accessToken;
 
     //     const adminAccessToken = async () => {
@@ -228,7 +229,7 @@ export const authActions = (set, get) => ({
     //         } 
     //         console.log('Administrator authentication failed: ', error);
     //     }
-    // },
+    },
 
     refreshAccessToken: async () => {
         const refresh = get().refreshToken;
