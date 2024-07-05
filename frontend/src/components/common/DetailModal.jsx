@@ -73,9 +73,11 @@ const DetailModal = ({ isOpen, onClose, stream }) => {
                                     className='text-base lg:text-xl font-semibold my-0 lg:my-0.5 hover:opacity-65 dark:hover:opacity-80 text-justify'>
                                     {stream.title}
                                 </StreamLink>
-                                <span className='text-slate-600 dark:text-[#c3cfe2]'>
+                                <StreamLink
+                                    url={stream.channel_link}
+                                    className='text-slate-600 hover:opacity-65 dark:text-[#c3cfe2]'>
                                     {stream.channel_name}
-                                </span>
+                                </StreamLink>
                             </div>
                         </div>
                     </div>
