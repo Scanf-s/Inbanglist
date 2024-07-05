@@ -41,7 +41,7 @@ const StreamItem = ({ stream }) => {
                     <img
                         src={imgSrc}
                         alt={stream.title}
-                        className='block w-full h-auto rounded-md'
+                        className='block w-full h-auto rounded-md max-h-[240px]'
                         onError={handleError}
                     />
                 </div>
