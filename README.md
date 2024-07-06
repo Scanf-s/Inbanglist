@@ -122,8 +122,10 @@ Docker
 
 ## 어플리케이션 아키텍쳐
 
+### Version 1
 ![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/868007f2-7db3-40de-8032-c924e506a736)
 
 ## ERD
 
+### Version 1
 ![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/43d15070-0128-439d-9e8d-df376c2842a7)
