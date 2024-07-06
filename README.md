@@ -1,4 +1,4 @@
-# 라이브 스트리밍 리스트 프로젝트
+# 라이브 스트리밍 리스트 프로젝트 Version 1
 
 ![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
 
@@ -7,6 +7,21 @@
 `라이브 스트리밍 리스트` 프로젝트는 다양한 실시간 방송 플랫폼에서 실시간 스트리밍 데이터를 수집하고 이를 사용자에게 제공하는 웹 애플리케이션입니다.
 현재 구현된 내용은 실시간 방송 플랫폼으로부터 데이터를 수집하여, 시청자 순으로 데이터를 제공하는 기능만 구현되어 있습니다.
 추후 태그, 관심도에 따른 실시간 방송 리스트를 보여주는 기능을 추가할 예정입니다.
+
+## 구현 기능
+
+## Version 1
+
+### 플랫폼 별 시청자 순 정렬
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/ddaff456-3b8e-47fa-84de-1f39eb81e9f9)
+
+### 간단한 로그인 기능 구현
+
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/f16efc67-4591-46dd-bdda-00d7e3a1a914)
+
+### API 호출 페이지네이션 기능
+
+https://github.com/Scanf-s/live_streaming_lists/assets/105439069/307ca6ff-fffe-4c3a-8ae6-3500f518c711
 
 ## 팀원 구성
 
@@ -48,7 +63,7 @@
   - **데이터 화면 배치**: 가공된 데이터를 화면에 배치하고 UI 컴포넌트 작성.
 
 
-## 1. 개발 환경
+## 개발 환경
 Docker
 
 - Django API
@@ -65,7 +80,7 @@ Docker
   - MacOS
   - VScode
 
-## 2. 사용 기술
+## 사용 기술
 
 ### Frontend
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
@@ -101,24 +116,15 @@ Docker
 ![AWS EC2](https://img.shields.io/badge/aws-ec2-FF9900?style=for-the-badge&logo=amazon-ec2&logoColor=white)
 ![AWS ACM](https://img.shields.io/badge/aws-acm-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
+## 브랜치 전략
 
-## 3. 브랜치 전략
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c385a945-4d04-48ad-a569-d8d7d0fa32bb)
 
-사진 첨부 해야함
-
-## 4. 프로젝트 구조
-
-```yml
-main branch로 합친 뒤, 해당 프로젝트의 프로젝트 구조를 넣을 예정입니다.
-```
-
-## 5. 기능 소개
-
-## 6. 어플리케이션 아키텍쳐
+## 어플리케이션 아키텍쳐
 
 ![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/868007f2-7db3-40de-8032-c924e506a736)
 
-## 7. ERD
+## ERD
 
-사진 첨부 해야함
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/43d15070-0128-439d-9e8d-df376c2842a7)
 
