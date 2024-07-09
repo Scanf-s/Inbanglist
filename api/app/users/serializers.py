@@ -1,5 +1,6 @@
 import os
 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
@@ -17,13 +18,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         username = attrs.get("username")
         email = attrs.get("email")
 
-        # 이메일이 소셜 계정으로 등록된 경우 확인
-        if UserOAuth2Platform.objects.filter(user__email=email, oauth_platform__in=["naver", "google"]).exists():
-            raise serializers.ValidationError("Email is already registered with a social account")
-
-        # 사용자명이 이미 존재하는지 확인
-        if User.objects.filter(username=username).exists():
-            raise serializers.ValidationError("Username already exists")
+        # 사용자명 및 이메일이 이미 존재하는지 확인
+        if User.objects.filter(Q(username=username) | Q(email=email)).exists():
+            raise serializers.ValidationError("Username or Email already exists")
 
         return attrs
 
@@ -47,7 +44,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = ["username", "email", "password"]
 
 
-class UserLoginSerializer(serializers.ModelSerializer):
+class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
 
@@ -55,22 +52,15 @@ class UserLoginSerializer(serializers.ModelSerializer):
         email = attrs.get("email")
         password = attrs.get("password")
 
-        # 이메일 조회
-        user = get_object_or_404(User, email=email)
+        try:
+            user = User.objects.get(email=email, is_active=True)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid email or password")
 
-        # 비밀번호 검사
         if not user.check_password(password):
-            raise serializers.ValidationError("Password does not match")
-
-        # 사용자 활성 상태 확인
-        if not user.is_active:
-            raise serializers.ValidationError("User is not active. Please check your email")
+            raise serializers.ValidationError("Invalid email or password")
 
         return {"user": user}
-
-    class Meta:
-        model = User
-        fields = ["email", "password"]
 
 
 class UserLogoutSerializer(serializers.Serializer):
@@ -107,7 +97,7 @@ class UserDeleteSerializer(serializers.Serializer):
     """
 
     email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True)
     refresh_token = serializers.CharField()
 
     def validate(self, attrs):
@@ -115,11 +105,11 @@ class UserDeleteSerializer(serializers.Serializer):
         password = attrs.get("password")
         refresh_token = attrs.get("refresh_token")
 
-        if not email or not refresh_token:
-            raise serializers.ValidationError("Email and refresh token are required")
+        if not email or not password or not refresh_token:
+            raise serializers.ValidationError("Email, password, and refresh token are required")
 
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=email, is_active=True)
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found")
 
@@ -130,16 +120,16 @@ class UserDeleteSerializer(serializers.Serializer):
                 "Cannot delete social account via this endpoint. Use the User/OAuth2 API."
             )
 
-        if not password:
-            raise serializers.ValidationError("Password is required for non-social login users")
         if not user.check_password(password):
             raise serializers.ValidationError("Password does not match")
 
         try:
-            RefreshToken(refresh_token)
+            refresh_token_instance  = RefreshToken(refresh_token)
         except TokenError:
             raise serializers.ValidationError("Invalid or expired refresh token")
 
+        attrs["user"] = user
+        attrs["refresh_token_instance"] = refresh_token_instance
         return attrs
 
 

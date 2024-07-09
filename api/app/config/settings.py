@@ -305,17 +305,20 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Asia/Seoul"
+CELERY_BEAT_SCHEDULE = {
+    'load-data-every-10-minutes': {
+        'task': 'common.tasks.load_data_to_cache',
+        'schedule': 600.0,  # 10 minutes (600 seconds)
+    },
+}
 
 # Redis Cache to decrease api call time
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://redis:6379",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         },
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379",
+    }
+}
 
 # 테스트 설정
 if "test" in sys.argv:

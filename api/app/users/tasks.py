@@ -7,15 +7,18 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import send_mail
 from django.urls import reverse
 
+from users.utils import generate_email_token
+
 
 @shared_task
-def send_activation_email_task(user_email: str, token: str) -> None:
+def send_activation_email_task(user_email: str) -> None:
     # activation_link = "http://127.0.0.1:8000" + reverse("user_email_activate", args=[token])
     main_domain = os.getenv("MAIN_DOMAIN")
     if not main_domain:
         raise ImproperlyConfigured("MAIN_DOMAIN environment variable is not set")
 
-    activation_link: str = main_domain + reverse("user_email_activate", args=[token])
+    email_token = generate_email_token(user_email)
+    activation_link: str = main_domain + reverse("user_email_activate", args=[email_token])
     subject = "Activate your account"
     body = f"""
     Hello,

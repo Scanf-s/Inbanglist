@@ -10,7 +10,7 @@ from common.platforms import OAuthPlatforms
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, password, **extra_fields):
+    def create_user(self, email, password=None, **extra_fields):
         """
         Creates a new user with the given email and password. If the email is not provided, a ValueError will be raised.
 
@@ -30,22 +30,8 @@ class UserManager(BaseUserManager):
 
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_social_user(self, email, username, is_active, last_login):
-        if not email:
-            raise ValueError("The Email field must be set")
-
-        email = self.normalize_email(email)
-        user = self.model(
-            email=email,
-            username=username,
-            profile_image=os.getenv("DEFAULT_PROFILE_IMAGE"),
-            is_active=is_active,
-            last_login=last_login,
-        )
+        if password:
+            user.set_password(password)
         user.save(using=self._db)
         return user
 
@@ -56,13 +42,13 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
-    email: EmailField = models.EmailField(max_length=255, unique=True, null=False)
-    username: CharField = models.CharField(max_length=255, null=True)
-    profile_image: CharField = models.CharField(
+    email = models.EmailField(max_length=255, unique=True, null=False, db_index=True)
+    username = models.CharField(max_length=255, null=True, db_index=True)
+    profile_image = models.CharField(
         max_length=255, null=True, default=os.getenv("DEFAULT_PROFILE_IMAGE_URL")
     )  # aws s3 url
-    is_staff: BooleanField = models.BooleanField(default=False)
-    is_active: BooleanField = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -75,5 +61,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
 
 class UserOAuth2Platform(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    oauth_platform = models.CharField(max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True)
+    oauth_platform = models.CharField(
+        max_length=50,
+        choices=OAuthPlatforms.platform_choices,
+        default="none",
+        null=True
+    )
     oauth2_user_id = models.CharField(max_length=255, null=True)

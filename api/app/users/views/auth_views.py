@@ -86,11 +86,10 @@ class UserRegisterAPI(generics.CreateAPIView):
         logger.info("POST /api/v1/users/register")
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = serializer.save()  # is_valid()=True 인 경우만 데이터베이스에 사용자 추가
+            user = serializer.save()
             # 비동기로 이메일 전송 작업을 큐에 추가
             # Celery를 사용하여 이메일 전송 작업을 백그라운드에서 비동기적으로 처리
-            token = generate_email_token(user.email)  # 사용자 정보가 저장된 후, 이메일 인증 토큰을 생성
-            send_activation_email_task.delay(user.email, token)  # 이메일 전송 작업을 비동기로 큐에 추가
+            send_activation_email_task.delay(user.email)  # 이메일 전송 작업을 비동기로 큐에 추가
             # delay 메서드는 Celery에서 작업을 비동기로 실행하도록 예약하는 메서드 (email send 작업을 비동기로 큐에 추가하고 즉시 반환)
             # 비동기 작업을 큐에 추가한 후, API는 사용자 생성 성공 메시지와 함께 사용자 데이터 및 토큰을 클라이언트에 반환
             logger.info(f"User {user.email} created and activation email sent.")
@@ -171,10 +170,10 @@ class UserLoginAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs) -> Response:
         logger.info("POST /api/v1/users/login")
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():  # validate email and password in serializer
+        if serializer.is_valid(raise_exception=True):  # validate email and password in serializer
             user = serializer.validated_data["user"]
             user.last_login = timezone.now()
-            user.save()
+            user.save(update_fields=["last_login"])
             tokens = get_jwt_tokens_for_user(user)
 
             logger.info(f"User {user.email} logged in successfully.")
@@ -359,25 +358,21 @@ class UserDeleteAPI(generics.GenericAPIView):
         logger.info(f"DELETE /api/v1/users/delete by user {request.user.email}")
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            refresh_token = serializer.validated_data["refresh_token"]
+            user = serializer.validated_data["user"]
+            refresh_token_instance = serializer.validated_data["refresh_token_instance"]
             try:
-                user = User.objects.get(email=email)
-
                 # RefreshToken을 블랙리스트에 추가
-                refresh_token_instance = RefreshToken(refresh_token)
                 refresh_token_instance.blacklist()
-
                 # 사용자 삭제
                 user.delete()
-                logger.info(f"User {email} deleted successfully.")
+                logger.info(f"User {user.email} deleted successfully.")
                 return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
-            except User.DoesNotExist:
-                logger.error(f"User not found: {email}")
-                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-            except TokenError as e:
-                logger.error(f"Invalid refresh token: {str(e)}")
-                return Response({"message": "Invalid refresh token"}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                logger.error(f"An error occurred while deleting user {user.email}: {str(e)}")
+                return Response(
+                    {"message": "An error occurred while deleting the user"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         logger.error(f"User deletion failed: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -524,7 +519,13 @@ class UserEmailActivationAPI(generics.GenericAPIView):
                 return redirect(f"{os.getenv('MAIN_DOMAIN')}/activate/{token}")
             else:
                 logger.error(f"User not found for email: {email}")
-                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"message": "User not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         else:
             logger.error(f"Invalid or expired activation code for token: {token}")
-            return Response({"message": "Invalid or expired activation code"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Invalid or expired activation code"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
