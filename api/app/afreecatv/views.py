@@ -1,7 +1,11 @@
 import logging
+import json
+
+from rest_framework.response import Response
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics
+from django.core.cache import cache
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -56,24 +60,39 @@ logger = logging.getLogger(__name__)
     """,
 )
 class AfreecaTvListAPI(generics.ListAPIView):
-    """
-    API endpoint to retrieve a list of AfreecaTV streams sorted by the number of concurrent viewers.
-    """
-
-    queryset = CommonModel.objects.filter(platform="afreecatv").order_by("-concurrent_viewers")
     serializer_class = AfreecaTvDataSerializer
     pagination_class = AfreecaTVPagination
     permission_classes = [AllowAny]
 
+    def get_queryset(self):
+        return CommonModel.objects.filter(platform="afreecatv").order_by("-concurrent_viewers")
+
     def list(self, request, *args, **kwargs):
-        """
-        Handles GET requests to retrieve AfreecaTV streams.
-        Logs the request and response status for monitoring and debugging purposes.
-        """
         logger.info("GET /api/v1/afreecatv")
-        response = super().list(request, *args, **kwargs)
-        logger.info(f"Response Status Code: {response.status_code}")
-        return response
+
+        limit = request.query_params.get('limit', AfreecaTVPagination.default_limit)
+        offset = request.query_params.get('offset', 0)
+        cache_key = f"afreecatv_data_limit_{limit}_offset_{offset}"
+        cache_time = 600 # 10분
+        data = cache.get(cache_key)
+
+        if data is None:
+            logger.info("Cache miss. Loading data from the database.")
+            queryset = self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                data = serializer.data
+                cache.set(cache_key, json.dumps(data), cache_time)
+            else:
+                serializer = self.get_serializer(queryset, many=True)
+                data = serializer.data
+                cache.set(cache_key, json.dumps(data), cache_time)
+        else:
+            logger.info("Cache hit. Loading data from the cache.")
+            data = json.loads(data)
+
+        return Response(data)
 
 
 @extend_schema(

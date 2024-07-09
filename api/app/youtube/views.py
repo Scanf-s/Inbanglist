@@ -1,9 +1,12 @@
 import logging
+import json
 
 from drf_spectacular.utils import extend_schema
+from django.core.cache import cache
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.response import Response
 
 from common.models import CommonModel
 from youtube.pagination import YoutubePagination
@@ -55,16 +58,40 @@ logger = logging.getLogger(__name__)
     """,
 )
 class YoutubeListAPI(generics.ListAPIView):
-    queryset = CommonModel.objects.filter(platform="youtube").order_by("-concurrent_viewers")
     serializer_class = YoutubeDataSerializer
     pagination_class = YoutubePagination
     permission_classes = [AllowAny]
 
+    def get_queryset(self):
+        return CommonModel.objects.filter(platform="youtube").order_by("-concurrent_viewers")
+
     def list(self, request, *args, **kwargs):
         logger.info("GET /api/v1/youtube")
-        response = super().list(request, *args, **kwargs)
-        logger.info(f"Response Status Code: {response.status_code}")
-        return response
+
+        # 우선 Redis Cache에서 데이터를 찾는다
+        limit = request.query_params.get('limit', YoutubePagination.default_limit)
+        offset = request.query_params.get('offset', 0)
+        cache_key = f"youtube_data_limit_{limit}_offset_{offset}"
+        cache_time = 600 # 10분
+        data = cache.get(cache_key)
+
+        if data is None:
+            logger.info("Cache miss. Loading data from the database.")
+            queryset = self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                data = serializer.data
+                cache.set(cache_key, json.dumps(data), cache_time)
+            else:
+                serializer = self.get_serializer(queryset, many=True)
+                data = serializer.data
+                cache.set(cache_key, json.dumps(data), cache_time)
+        else:
+            logger.info("Cache hit. Loading data from the cache.")
+            data = json.loads(data)
+
+        return Response(data)
 
 
 @extend_schema(

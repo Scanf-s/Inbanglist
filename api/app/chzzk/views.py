@@ -1,6 +1,9 @@
 import logging
+import json
 
 from drf_spectacular.utils import extend_schema
+from rest_framework.response import Response
+from django.core.cache import cache
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -58,17 +61,39 @@ class ChzzkListAPI(generics.ListAPIView):
     """
     API endpoint to retrieve a list of Chzzk streams sorted by the number of concurrent viewers.
     """
-
-    queryset = CommonModel.objects.filter(platform="chzzk").order_by("-concurrent_viewers")
     serializer_class = ChzzkDataSerializer
     pagination_class = ChzzkPagination
     permission_classes = [AllowAny]
 
+    def get_queryset(self):
+        return CommonModel.objects.filter(platform="chzzk").order_by("-concurrent_viewers")
+
     def list(self, request, *args, **kwargs):
         logger.info("GET /api/v1/chzzk")
-        response = super().list(request, *args, **kwargs)
-        logger.info(f"Response Status Code: {response.status_code}")
-        return response
+
+        limit = request.query_params.get('limit', ChzzkPagination.default_limit)
+        offset = request.query_params.get('offset', 0)
+        cache_key = f"chzzk_data_limit_{limit}_offset_{offset}"
+        cache_time = 600
+        data = cache.get(cache_key)
+
+        if data is None:
+            logger.info("Cache miss. Loading data from the database.")
+            queryset = self.get_queryset()
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                data = serializer.data
+                cache.set(cache_key, json.dumps(data), cache_time)
+            else:
+                serializer = self.get_serializer(queryset, many=True)
+                data = serializer.data
+                cache.set(cache_key, json.dumps(data), cache_time)
+        else:
+            logger.info("Cache hit. Loading data from the cache.")
+            data = json.loads(data)
+
+        return Response(data)
 
 
 @extend_schema(

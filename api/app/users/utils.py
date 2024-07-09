@@ -22,9 +22,9 @@ def confirm_email_token(token, expiration=3600) -> Union[str, bool]:
     serializer = URLSafeSerializer(settings.SECRET_KEY)
     try:
         email: str = serializer.loads(token, salt=settings.SECRET_KEY, max_age=expiration)
+        return email
     except:
         return False
-    return email
 
 
 def get_jwt_tokens_for_user(user: User) -> Dict[str, str]:

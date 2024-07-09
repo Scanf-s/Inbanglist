@@ -363,9 +363,10 @@ class UserNaverLoginCallBackAPI(generics.GenericAPIView):
                     logger.info(f"Social account linked for existing user: {user_email}")
                 else:
                     # 새로운 사용자의 경우
-                    user = User.objects.create_social_user(
+                    user = User.objects.create_user(
                         email=user_email,
                         username=user_email.split("@")[0],
+                        profile_image=os.getenv("DEFAULT_PROFILE_IMAGE_URL"),
                         last_login=timezone.now(),
                         is_active=True,
                     )
@@ -596,10 +597,11 @@ class UserGoogleLoginCallBackAPI(generics.GenericAPIView):
                     logger.info(f"Social account linked for existing user: {user_email}")
                 else:
                     # 새로운 사용자의 경우
-                    user = User.objects.create_social_user(
+                    user = User.objects.create_user(
                         email=user_email,
                         username=user_email.split("@")[0],
                         last_login=timezone.now(),
+                        profile_image=os.getenv("DEFAULT_PROFILE_IMAGE_URL"),
                         is_active=True,
                     )
                     UserOAuth2Platform.objects.create(user=user, oauth_platform="google", oauth2_user_id=user_id)
