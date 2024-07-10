@@ -16,9 +16,7 @@ class TimeStampedModel(models.Model):
 class CommonModel(TimeStampedModel):
 
     channel_description = models.TextField(null=True)  # 채널(프로필, 방송국)에 써있는 소개글 담는 필드
-    channel_followers = models.PositiveIntegerField(
-        default=0, null=False
-    )  # 구독자, 팔로워, 즐겨찾기 수
+    channel_followers = models.PositiveIntegerField(default=0, null=False)  # 구독자, 팔로워, 즐겨찾기 수
     channel_link = models.URLField(
         max_length=1024, null=False
     )  # 유튜브 : 채널 링크, 치지직 : 프로필 링크, 아프리카TV : 방송국 링크

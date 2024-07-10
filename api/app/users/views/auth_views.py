@@ -174,17 +174,41 @@ class UserLoginAPI(generics.GenericAPIView):
             user = serializer.validated_data["user"]
             user.last_login = timezone.now()
             user.save(update_fields=["last_login"])
-            tokens = get_jwt_tokens_for_user(user)
 
-            logger.info(f"User {user.email} logged in successfully.")
-            return Response(
+            # Response data
+            jwt_tokens = get_jwt_tokens_for_user(user)  # generate jwt tokens for logged in user
+            response = Response(
                 {
-                    "message": "Login successful",
-                    "jwt_tokens": tokens,
+                    "message": "Login Successful",
                 },
                 status=status.HTTP_200_OK,
             )
 
+            # HTTPOnly Cookie에 담아서 사용자측에서 실행하는 javascript가
+            # jwt가 담긴 쿠키를 액세스할 수 없도록 설정한다.
+            # https://docs.djangoproject.com/en/5.0/ref/request-response/#django.http.HttpResponse.set_cookie
+            # access_token 추가
+            response.set_cookie(
+                key="access_token",
+                value=jwt_tokens["access"],
+                httponly=True,
+                samesite="Lax",  # 도메인과 서브도메인이 동일한 경우에만 쿠키가 전달됨
+                secure=True,
+            )
+
+            # refresh_token 추가
+            response.set_cookie(
+                key="refresh_token",
+                value=jwt_tokens["refresh"],
+                httponly=True,
+                samesite="Lax",  #
+                secure=True,
+            )
+
+            logger.info(f"User {user.email} logged in successfully.")
+            return response
+
+        # 로그인 실패한 경우
         logger.error(f"User login failed: {serializer.errors}")
         return Response(
             {
@@ -370,8 +394,7 @@ class UserDeleteAPI(generics.GenericAPIView):
             except Exception as e:
                 logger.error(f"An error occurred while deleting user {user.email}: {str(e)}")
                 return Response(
-                    {"message": "An error occurred while deleting the user"},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"message": "An error occurred while deleting the user"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
         logger.error(f"User deletion failed: {serializer.errors}")
@@ -519,13 +542,7 @@ class UserEmailActivationAPI(generics.GenericAPIView):
                 return redirect(f"{os.getenv('MAIN_DOMAIN')}/activate/{token}")
             else:
                 logger.error(f"User not found for email: {email}")
-                return Response(
-                    {"message": "User not found"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+                return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             logger.error(f"Invalid or expired activation code for token: {token}")
-            return Response(
-                {"message": "Invalid or expired activation code"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"message": "Invalid or expired activation code"}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,6 @@
 import os
 
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -124,7 +123,7 @@ class UserDeleteSerializer(serializers.Serializer):
             raise serializers.ValidationError("Password does not match")
 
         try:
-            refresh_token_instance  = RefreshToken(refresh_token)
+            refresh_token_instance = RefreshToken(refresh_token)
         except TokenError:
             raise serializers.ValidationError("Invalid or expired refresh token")
 
