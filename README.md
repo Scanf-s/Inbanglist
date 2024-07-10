@@ -118,7 +118,7 @@ Docker
 
 ## 브랜치 전략
 
-![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c385a945-4d04-48ad-a569-d8d7d0fa32bb)
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/ea9420bf-97fb-4341-a282-659c7f841099)
 
 ## 어플리케이션 아키텍쳐
 
