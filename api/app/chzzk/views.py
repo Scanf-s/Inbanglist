@@ -1,11 +1,11 @@
-import logging
 import json
+import logging
 
-from drf_spectacular.utils import extend_schema
-from rest_framework.response import Response
 from django.core.cache import cache
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from chzzk.pagination import ChzzkPagination
@@ -61,6 +61,7 @@ class ChzzkListAPI(generics.ListAPIView):
     """
     API endpoint to retrieve a list of Chzzk streams sorted by the number of concurrent viewers.
     """
+
     serializer_class = ChzzkDataSerializer
     pagination_class = ChzzkPagination
     permission_classes = [AllowAny]
@@ -71,29 +72,40 @@ class ChzzkListAPI(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         logger.info("GET /api/v1/chzzk")
 
-        limit = request.query_params.get('limit', ChzzkPagination.default_limit)
-        offset = request.query_params.get('offset', 0)
+        limit = request.query_params.get("limit", ChzzkPagination.default_limit)
+        offset = request.query_params.get("offset", 0)
         cache_key = f"chzzk_data_limit_{limit}_offset_{offset}"
         cache_time = 600
-        data = cache.get(cache_key)
 
-        if data is None:
-            logger.info("Cache miss. Loading data from the database.")
-            queryset = self.get_queryset()
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                data = serializer.data
-                cache.set(cache_key, json.dumps(data), cache_time)
-            else:
-                serializer = self.get_serializer(queryset, many=True)
-                data = serializer.data
-                cache.set(cache_key, json.dumps(data), cache_time)
-        else:
+        # Redis Cache에서 데이터를 꺼내와본다.
+        cached_data = cache.get(cache_key)
+        if cached_data:
             logger.info("Cache hit. Loading data from the cache.")
-            data = json.loads(data)
+            return Response(json.loads(cached_data))
 
-        return Response(data)
+        logger.info("Cache miss. Loading data from the database.")
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            data = serializer.data
+            # LimitOffsetPagination Class에 있는 get_paginated_response()를 호출해서
+            # 페이지네이션된 응답 데이터를 통합적으로 처리
+            response_data = self.get_paginated_response(data).data
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            data = serializer.data
+            response_data = {
+                "count": len(queryset),
+                "next": None,
+                "previous": None,
+                "results": data,
+            }
+
+        # 데이터 Response 하기 전에, Cache에 직렬화해서 저장
+        cache.set(cache_key, json.dumps(response_data), cache_time)
+
+        return Response(response_data)
 
 
 @extend_schema(

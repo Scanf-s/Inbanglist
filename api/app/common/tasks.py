@@ -1,5 +1,6 @@
 from celery import shared_task
 from django.core.cache import cache
+
 from common.models import CommonModel
 
 
@@ -9,5 +10,5 @@ def load_data_to_cache():
     data = list(CommonModel.objects.all().order_by("-concurrent_viewers"))
 
     # 캐시에 데이터 저장 (10분 TTL)
-    cache.set('external_data', data, timeout=600)
+    cache.set("external_data", data, timeout=600)
     print("Data loaded to cache successfully")

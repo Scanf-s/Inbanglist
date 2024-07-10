@@ -306,9 +306,9 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Asia/Seoul"
 CELERY_BEAT_SCHEDULE = {
-    'load-data-every-10-minutes': {
-        'task': 'common.tasks.load_data_to_cache',
-        'schedule': 600.0,  # 10 minutes (600 seconds)
+    "load-data-every-10-minutes": {
+        "task": "common.tasks.load_data_to_cache",
+        "schedule": 600.0,  # 10 minutes (600 seconds)
     },
 }
 

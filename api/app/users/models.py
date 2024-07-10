@@ -61,10 +61,5 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
 
 class UserOAuth2Platform(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    oauth_platform = models.CharField(
-        max_length=50,
-        choices=OAuthPlatforms.platform_choices,
-        default="none",
-        null=True
-    )
+    oauth_platform = models.CharField(max_length=50, choices=OAuthPlatforms.platform_choices, default="none", null=True)
     oauth2_user_id = models.CharField(max_length=255, null=True)
