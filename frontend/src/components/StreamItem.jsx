@@ -41,7 +41,7 @@ const StreamItem = ({ stream }) => {
                     <img
                         src={imgSrc}
                         alt={stream.title}
-                        className='block w-full h-auto rounded-md'
+                        className='block w-full h-auto rounded-md max-h-[240px]'
                         onError={handleError}
                     />
                 </div>
@@ -82,9 +82,11 @@ const StreamItem = ({ stream }) => {
                         className='truncate py-1 font-semibold text-base lg:text-lg dark:text-[#f5f7fa] hover:opacity-65 dark:hover:opacity-80'>
                         {stream.title}
                     </Link>
-                    <div className='text-xs lg:text-sm text-slate-600 dark:text-[#c3cfe2]'>
+                    <Link
+                        to={stream.channel_link}
+                        className='text-xs lg:text-sm text-slate-600 hover:opacity-65 dark:text-[#c3cfe2]'>
                         {stream.channel_name}
-                    </div>
+                    </Link>
                     <div className='text-xs lg:text-sm text-slate-600 dark:text-[#c3cfe2]'>
                         {timeDiff.hours > 0
                             ? `${timeDiff.hours}시간 ${timeDiff.minutes}분 ${timeDiff.seconds}초 전`
