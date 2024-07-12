@@ -1,4 +1,4 @@
-# 라이브 스트리밍 리스트 프로젝트 Version 1
+# 라이브 스트리밍 리스트 프로젝트
 
 ![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
 
