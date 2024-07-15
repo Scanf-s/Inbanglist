@@ -1,0 +1,41 @@
+name: Deploy to S3
+
+on:
+    push:
+        branches: ['frontend']
+    pull_request:
+        branches: ['frontend']
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [18.x]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'npm'
+                  cache-dependency-path: ./frontend/package-lock.json
+
+            - run: npm install
+              working-directory: ./frontend
+
+            - run: npm run build --if-present
+              working-directory: ./frontend
+
+            - uses: awact/s3-action@master
+              with:
+                  args: --acl public-read --follow-symlinks --delete
+              env:
+                  SOURCE_DIR: './frontend/dist'
+                  AWS_REGION: 'ap-northeast-2'
+                  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
