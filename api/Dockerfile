@@ -9,6 +9,7 @@ ENV PYTHONUNBUFFERED=1
 
 # 로컬 파일 시스템의 requirements.txt 파일을 컨테이너로 복사
 COPY ./requirements.txt /tmp/requirements.txt
+COPY ./requirements.dev.txt /tmp/requirements.dev.txt
 COPY ./app /app
 
 # 작업 디렉토리를 /app으로 설정
@@ -35,6 +36,10 @@ RUN python -m venv /py && \
         --no-create-home \
         django-user
 
+# 로그 디렉토리 생성 및 권한 설정
+RUN mkdir -p /app/logs && \
+    chown django-user:django-user /app/logs
+
 # 경로 설정
 ENV PATH="/py/bin:$PATH"
 
@@ -45,4 +50,4 @@ EXPOSE 8000
 USER django-user
 
 # Django 프로젝트 실행
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application", "--workers", "4", "--log-level", "debug"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.asgi:application", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--log-level", "debug", "--access-logfile", "/app/logs/access.log", "--error-logfile", "/app/logs/error.log"]

@@ -126,4 +126,4 @@ Docker
 
 ## ERD
 
-![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/43d15070-0128-439d-9e8d-df376c2842a7)
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/43d15070-0128-439d-9e8d-df376c2842a7

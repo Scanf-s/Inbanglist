@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - backend
+    paths:
+      - 'api/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create .env file
+      run: |
+        echo "DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}" >> .env
+        echo "DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}" >> .env
+        echo "DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+        echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+
+    - name: Set up Docker Compose
+      run: docker-compose up -d
+
+    - name: Run Black
+      run: docker-compose run --rm api sh -c 'black . --check'
+
+    - name: Run Isort
+      run: docker-compose run --rm api sh -c 'isort . --check-only'
+
+    - name: Run Mypy
+      run: docker-compose run --rm api sh -c 'mypy --config-file /app/mypy.ini .'
