@@ -2,6 +2,8 @@
 
 ![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
 
+![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
+
 ## 프로젝트 소개
 
 `라이브 스트리밍 리스트` 프로젝트는 다양한 실시간 방송 플랫폼에서 실시간 스트리밍 데이터를 수집하고 이를 사용자에게 제공하는 웹 애플리케이션입니다.
@@ -118,12 +120,15 @@ Docker
 
 ## 브랜치 전략
 
-![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c385a945-4d04-48ad-a569-d8d7d0fa32bb)
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/ea9420bf-97fb-4341-a282-659c7f841099)
 
 ## 어플리케이션 아키텍쳐
+
+### Version 1
 
 ![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/868007f2-7db3-40de-8032-c924e506a736)
 
 ## ERD
 
-![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/43d15070-0128-439d-9e8d-df376c2842a7
+### Version 1
+![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/43d15070-0128-439d-9e8d-df376c2842a7)
