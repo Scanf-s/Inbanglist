@@ -1,4 +1,6 @@
-# 라이브 스트리밍 리스트 프로젝트
+# 라이브 스트리밍 리스트 프로젝트 Version 1
+
+![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
 
 ![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
 
@@ -123,6 +125,7 @@ Docker
 ## 어플리케이션 아키텍쳐
 
 ### Version 1
+
 ![image](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/868007f2-7db3-40de-8032-c924e506a736)
 
 ## ERD
