@@ -2,8 +2,6 @@
 
 ![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
 
-![project_img](https://github.com/Scanf-s/live_streaming_lists/assets/105439069/c90b22b5-9422-47a2-b6e0-71e550fd80f9)
-
 ## 프로젝트 소개
 
 `라이브 스트리밍 리스트` 프로젝트는 다양한 실시간 방송 플랫폼에서 실시간 스트리밍 데이터를 수집하고 이를 사용자에게 제공하는 웹 애플리케이션입니다.
